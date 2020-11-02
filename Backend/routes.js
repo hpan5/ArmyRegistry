@@ -15,9 +15,9 @@ router.get('/fetchSoldiers/:order', async (req, res) => {
         if (order == "default") {
             soldiers = await Soldier.find();
         } else if (order === "asc") {
-            soldiers = await Soldier.find().sort({name: 1});
+            soldiers = await Soldier.find().sort( {name: 1} );
         } else if (order == "dsc") {
-            soldiers = await Soldier.find().sort({name: -1});
+            soldiers = await Soldier.find().sort( {name: -1} );
         } else {
             res.status(404).send({error: "not valid order input"});
         }
@@ -36,6 +36,53 @@ router.get('/fetchSoldier/:id', async (req, res) => {
         if (err) res.status(404).send(err);
     }
 })
+
+//get subordinates based on id
+router.get('/fetchDirectSubordinates/:id', async (req, res) => {
+    try {
+        const soldier = await Soldier.findById(req.params.id);
+        const populated_soldier = await soldier.populate('direct_subordinates').execPopulate();
+        const direct_subordinates = populated_soldier.direct_subordinates;
+        res.send(direct_subordinates);
+    } catch (err) {
+        if (err) res.status(404).send({error : `${err}`});
+    }
+})
+
+//POST
+//create a new soldier
+router.post('/addNewSoldier', bodyParser.urlencoded({ extended: false}), async (req, res) => {
+    if (!req.body.name) {
+        res.status(400).send({message : 'content cnanot be empty!'});
+        return;
+    }
+    console.log("added new soilder: " + req.body.name);
+    //create a new soldier
+    const newSoilder = new Soldier({
+        _id: new mongoose.Types.ObjectId(),
+        name: req.body.name,
+        rank: req.body.rank,
+        sex: req.body.sex,
+        startDate: moment.utc(req.body.startDate), //might need validation
+        phone: req.body.phone,
+        email: req.body.email,
+        superior: req.body.superior,
+        direct_subordinates: []
+    })
+    console.log()
+    await newSoilder.save(async (err) => {
+        if (err) res.status(404).send(err);
+        if (req.body.superior) {
+            try {
+                addDirectSubroutine(req.body.superior, newSoilder._id);  
+            } catch {
+                res.status(404).send({error: "failed add superior"});
+            }
+        }
+    });
+    res.send(newSoilder);
+});
+
 
 //PUT
 //update/edit a soldier with id
@@ -82,41 +129,6 @@ router.put('/editSoldier/:id', async (req, res) => {
         if (err) res.status(404).send(err);
     }
 })
-
-//POST
-//create a new soldier
-router.post('/addNewSoldier', bodyParser.urlencoded({ extended: false}), async (req, res) => {
-    if (!req.body.name) {
-        res.status(400).send({message : 'content cnanot be empty!'});
-        return;
-    }
-    console.log("added new soilder: " + req.body.name);
-    //create a new soldier
-    const newSoilder = new Soldier({
-        _id: new mongoose.Types.ObjectId(),
-        name: req.body.name,
-        rank: req.body.rank,
-        sex: req.body.sex,
-        startDate: moment.utc(req.body.startDate), //might need validation
-        phone: req.body.phone,
-        email: req.body.email,
-        superior: req.body.superior,
-        direct_subordinates: []
-    })
-    console.log()
-    await newSoilder.save(async (err) => {
-        if (err) res.status(404).send(err);
-        if (req.body.superior) {
-            try {
-                addDirectSubroutine(req.body.superior, newSoilder._id);  
-            } catch {
-                res.status(404).send({error: "failed add superior"});
-            }
-        }
-    });
-    res.send(newSoilder);
-});
-
 
 //DELETE
 //delete an existing soldier

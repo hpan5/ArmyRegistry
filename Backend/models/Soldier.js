@@ -18,4 +18,5 @@ schema.method('toJSON', function() {
     return object;
 })
 
-module.exports = mongoose.model('soldier', schema);
+module.exports = mongoose.model('Soldier', schema);
+//image: {data: Buffer, contentType: String},
