@@ -8,6 +8,7 @@ const schema = Schema({
     phone: String,
     email: String,
     superior: { type: Schema.Types.ObjectId, ref: 'Soldier' },
+    superior_name: String,
     direct_subordinates:[{ type: Schema.Types.ObjectId, ref: 'Soldier' }],
     _id: Schema.Types.ObjectId
 })
