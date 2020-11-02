@@ -7,10 +7,24 @@ const { json } = require('express');
 const router = express.Router();
 
 //GET 
-//fetch all soldiers
-router.get('/fetchSoldiers', async (req, res) => {
-    const soldiers = await Soldier.find();
-    res.send(soldiers);
+//fetch all soldiers with three states of order: default, ascending, descending
+router.get('/fetchSoldiers/:order', async (req, res) => {
+    let soldiers;
+    let order = req.params.order.toString();
+    try {
+        if (order == "default") {
+            soldiers = await Soldier.find();
+        } else if (order === "asc") {
+            soldiers = await Soldier.find().sort({name: 1});
+        } else if (order == "dsc") {
+            soldiers = await Soldier.find().sort({name: -1});
+        } else {
+            res.status(404).send({error: "not valid order input"});
+        }
+        res.send(soldiers);
+    } catch(error) {
+        res.status(404).send({error: "failed to fetch soldiers"});
+    }
 })
 
 //fetch a soldier with id
@@ -132,6 +146,15 @@ router.delete("/deleteAll", async (req, res) => {
 //helper funct
 const isUndefined = (value) => {
     return (!value || typeof value == undefined || value === 'undefined' || value == null || value.length == 0 || value == "");
+}
+
+//helper funct
+const isDefined = (value) => {
+    if (!value || typeof value == undefined || value === 'undefined' || value == null || value.length == 0 || value == "") {
+        return false;
+    } else {
+        return true;
+    }
 }
 
 const deleteDirectSubroutine = async (superior_id, soldier_id) => {
