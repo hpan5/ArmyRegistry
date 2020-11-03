@@ -1,0 +1,12 @@
+div {
+    display: inline;
+}
+
+div form {
+    display: inline-block;
+}
+
+div button {
+    display: inline-block;
+    float: right;
+}

@@ -63,14 +63,13 @@ router.post('/addNewSoldier', bodyParser.urlencoded({ extended: false}), async (
         name: req.body.name,
         rank: req.body.rank,
         sex: req.body.sex,
-        startDate: moment.utc(req.body.startDate), //might need validation
+        startDate: moment.utc(new Date(req.body.startDate)).format('L'), //might need validation
         phone: req.body.phone,
         email: req.body.email,
         superior: req.body.superior,
         superior_name: req.body.superior_name,
         direct_subordinates: []
     })
-    console.log()
     await newSoilder.save(async (err) => {
         if (err) res.status(404).send(err);
         if (req.body.superior) {
@@ -94,7 +93,7 @@ router.put('/editSoldier/:id', async (req, res) => {
         soldier.name = req.body.name;
         soldier.rank = req.body.rank;
         soldier.sex = req.body.sex;
-        soldier.startDate = moment.utc(req.body.startDate); //might need validation
+        soldier.startDate = moment.utc(new Date(req.body.startDate)).format('L'); //might need validation
         soldier.phone = req.body.phone;
         soldier.email = req.body.email;
         soldier.superior_name = req.body.superior_name;

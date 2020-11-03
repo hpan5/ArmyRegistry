@@ -4,7 +4,7 @@ const schema = Schema({
     name: String,
     rank: String,
     sex: String,
-    startDate: Date,
+    startDate: String,
     phone: String,
     email: String,
     superior: { type: Schema.Types.ObjectId, ref: 'Soldier' },
