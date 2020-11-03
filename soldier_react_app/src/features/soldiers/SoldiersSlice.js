@@ -3,17 +3,33 @@ import axios from 'axios';
 const url = "http://localhost:8000/soldiers/";
 const initialState = {
     soldiers: [],
-    order: "default",
+    order: 'default',
     status: 'idle',
     error: null
 }
 
-export const fetchSoldiers = createAsyncThunk('soldiers/fetchSoldiers', async (order) => {
-    const apiUrl =  `${url}fetchSoldiers/${order}`;
+export const addSoldier = createAsyncThunk('soldiers/addSoldier', async (soldier) => {
+    const apiUrl =  `${url}addNewSoldier/`;
+    console.log("apiUrl:" + apiUrl);
+    const response = await axios.post(apiUrl, soldier);
+    console.log(response.data);
+    return soldier;
+});
+
+export const fetchSoldiers = createAsyncThunk('soldiers/fetchSoldiers', async (order, skip = 0) => {
+    skip = 0
+    const apiUrl =  `${url}fetchSoldiers/${order}?skip=${skip}`;
     console.log("apiUrl:" + apiUrl);
     const response = await axios.get(apiUrl);
     console.log(response.data);
     return response.data;
+});
+
+export const deleteSoldierById = createAsyncThunk('soldiers/deleteSoldierById', async (id) => {
+    const apiUrl =  `${url}deleteSoldier/${id}`;
+    console.log("apiUrl:" + apiUrl);
+    const response = await axios.delete(apiUrl);
+    return id;
 });
 
 export const fetchSoldierById = createAsyncThunk('soldiers/fetchSoldierById', async (id) => {
@@ -41,6 +57,10 @@ const soldiersSlice = createSlice({
         },
         soldierEdited(state, action) {
 
+        },
+        changeSoldierOrder(state, action) {
+            const { order } = action.payload;
+            state.order = order;
         }
     },
     extraReducers: {
@@ -74,11 +94,19 @@ const soldiersSlice = createSlice({
         [fetchDirectSubordinates_BySuperiorID.rejected]: (state, action) => {
             state.status = 'failed'
             state.soldiers.push(action.payload)
+        },
+        [addSoldier.fulfilled]: (state, action) => {
+            state.status = 'succeeded'
+            state.soldiers = [...state.soldiers, action.payload]
+        },
+        [addSoldier.rejected]: (state, action) => {
+            state.status = 'failed'
+            state.soldiers.push(action.payload)
         }
     }
 })
 
-export const { soldierAdded, soldierEdited } = soldiersSlice.actions;
+export const { soldierEdited, changeSoldierOrder } = soldiersSlice.actions;
 
 export default soldiersSlice.reducer;
 

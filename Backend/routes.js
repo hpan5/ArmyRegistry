@@ -5,19 +5,21 @@ const mongoose = require('mongoose');
 const moment = require('moment');
 const { json } = require('express');
 const router = express.Router();
-
+const LIMIT_PER_DOC = 20;
 //GET 
 //fetch all soldiers with three states of order: default, ascending, descending
 router.get('/fetchSoldiers/:order', async (req, res) => {
     let soldiers;
     let order = req.params.order.toString();
+    const skip =
+      req.query.skip && /^\d+$/.test(req.query.skip) ? Number(req.query.skip) : 0;
     try {
         if (order == "default") {
-            soldiers = await Soldier.find();
+            soldiers = await Soldier.find({}, undefined, { skip, limit: LIMIT_PER_DOC });
         } else if (order === "asc") {
-            soldiers = await Soldier.find().sort( {name: 1} );
+            soldiers = await Soldier.find({}, undefined, { skip, limit: LIMIT_PER_DOC }).sort( {name: 1} );
         } else if (order == "dsc") {
-            soldiers = await Soldier.find().sort( {name: -1} );
+            soldiers = await Soldier.find({}, undefined, { skip, limit: LIMIT_PER_DOC }).sort( {name: -1} );
         } else {
             res.status(404).send({error: "not valid order input"});
         }
@@ -40,8 +42,18 @@ router.get('/fetchSoldier/:id', async (req, res) => {
 //get subordinates based on id
 router.get('/fetchDirectSubordinates/:id', async (req, res) => {
     try {
+        const skip =
+            req.query.skip && /^\d+$/.test(req.query.skip) ? Number(req.query.skip) : 0;
         const soldier = await Soldier.findById(req.params.id);
-        const populated_soldier = await soldier.populate('direct_subordinates').execPopulate();
+        const populated_soldier = await soldier.
+            populate({
+                path: 'direct_subordinates', 
+                options: {
+                    skip, 
+                    limit: LIMIT_PER_DOC 
+                }
+            }).
+            execPopulate();
         const direct_subordinates = populated_soldier.direct_subordinates;
         res.send(direct_subordinates);
     } catch (err) {
@@ -133,7 +145,7 @@ router.put('/editSoldier/:id', async (req, res) => {
 
 //DELETE
 //delete an existing soldier
-router.delete("/delete/:id", async (req, res) => {
+router.delete("/deleteSoldier/:id", async (req, res) => {
     try {
         const soldier_toBeDeleted = await Soldier.findById(req.params.id);
         if (!isUndefined(soldier_toBeDeleted.superior)) {
