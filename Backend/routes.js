@@ -9,38 +9,83 @@ const LIMIT_PER_DOC = 20;
 //GET 
 //fetch all soldiers with three states of order: default, ascending, descending
 router.get('/fetchSoldiers', async (req, res) => {
-    let soldiers;
-
-    let sortField = isDefined(req.query.sortField) && req.query.sortField.toString();
-    let order = isDefined(req.query.order) ? req.query.order.toString() : 'default';
+    
+    let superior_id = isDefined(req.query.superior_id) && String(req.query.superior_id);
+    let sortField = isDefined(req.query.sortField) && String(req.query.sortField);
+    let order = isDefined(req.query.order) ? String(req.query.order) : 'default';
     const skip =
       req.query.skip && /^\d+$/.test(req.query.skip) ? Number(req.query.skip) : 0;
-    console.log("sortField:" + sortField + ", sortOrder: " + order + "skip:" + skip);
+    console.log("sortField:" + sortField + ", sortOrder: " + order + ", skip:" + skip);
+    console.log("type of sortField: " + typeof sortField);
+
     try {
-        if (order === "default") {
-            soldiers = await Soldier.find({}, undefined, { skip, limit: LIMIT_PER_DOC });
-        } else if (order === "asc") {
-            console.log("ascending");
-            soldiers = await Soldier.find({}, undefined, { skip, limit: LIMIT_PER_DOC }).sort(`${sortField}`);
-        } else if (order === "desc") {
-            console.log("descending");
-            soldiers = await Soldier.find({}, undefined, { skip, limit: LIMIT_PER_DOC }).sort( `-${sortField}` );
+        if (isDefined(req.query.superior_id)) {
+            //find direct subordinates for the solder with the provided superior_id
+            console.log("looking for all direct subordinates for the solder with the provided superior_id")
+            let direct_subordinates;
+            console.log("looking for a superior's direct subordinates");
+            const superior = await Soldier.findById(superior_id);
+            if (order === "default") {
+                const populated_soldier = await superior.
+                populate({
+                    path: 'direct_subordinates', 
+                    options: {
+                        skip, 
+                        limit: LIMIT_PER_DOC 
+                    }
+                }).
+                execPopulate();;
+                direct_subordinates = populated_soldier.direct_subordinates;
+            } else if (order === "asc") {
+                console.log("ascending");
+                const populated_soldier = await superior.
+                populate({
+                    path: 'direct_subordinates', 
+                    options: {
+                        sort: {[sortField] : 1},
+                        skip, 
+                        limit: LIMIT_PER_DOC 
+                    }
+                }).
+                execPopulate();;
+                direct_subordinates = populated_soldier.direct_subordinates;
+            } else if (order === "desc") {
+                console.log("descending");
+                //let descSort = {`${sortField}` : -1};
+                const populated_soldier = await superior.
+                populate({
+                    path: 'direct_subordinates', 
+                    options: {
+                        sort: {[sortField] : -1},
+                        skip, 
+                        limit: LIMIT_PER_DOC 
+                    }
+                }).
+                execPopulate();;
+                direct_subordinates = populated_soldier.direct_subordinates;
+            } else {
+                res.status(404).send({error: "not valid order input"});
+            }
+            res.send(direct_subordinates);
         } else {
-            res.status(404).send({error: "not valid order input"});
+            let soldiers;
+            console.log("looking for all soldiers")
+            if (order === "default") {
+                soldiers = await Soldier.find({}, undefined, { skip, limit: LIMIT_PER_DOC });
+            } else if (order === "asc") {
+                console.log("ascending");
+                soldiers = await Soldier.find({}, undefined, { sort: {[sortField] : 1}, skip, limit: LIMIT_PER_DOC });
+            } else if (order === "desc") {
+                console.log("descending");
+                soldiers = await Soldier.find({}, undefined, { sort: {[sortField] : -1}, skip, limit: LIMIT_PER_DOC }).sort( `-${sortField}` );
+            } else {
+                res.status(404).send({error: "not valid order input"});
+            }
+            res.send(soldiers);
         }
-        res.send(soldiers);
+        
     } catch(error) {
         res.status(404).send({error: "failed to fetch soldiers"});
-    }
-})
-
-//fetch a soldier with id
-router.get('/fetchSoldier/:id', async (req, res) => {
-    try {
-        const soldier = await Soldier.findOne( {_id : req.params.id} );
-        res.send(soldier);
-    } catch (err) {
-        if (err) res.status(404).send(err);
     }
 })
 
@@ -65,6 +110,18 @@ router.get('/fetchDirectSubordinates/:id', async (req, res) => {
         if (err) res.status(404).send({error : `${err}`});
     }
 })
+
+//fetch a soldier with id
+router.get('/fetchSoldier/:id', async (req, res) => {
+    try {
+        const soldier = await Soldier.findOne( {_id : req.params.id} );
+        res.send(soldier);
+    } catch (err) {
+        if (err) res.status(404).send(err);
+    }
+})
+
+
 
 //POST
 //create a new soldier

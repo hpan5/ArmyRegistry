@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectAllSoldiers, fetchSoldiers, fetchSoldierById, fetchDirectSubordinates_BySuperiorID } from './SoldiersSlice'
+import { selectAllSoldiers, fetchSoldiers, fetchSoldierById } from './SoldiersSlice'
 import { useHistory } from 'react-router-dom';
 
 const TableBody = () => {
@@ -48,7 +48,7 @@ const TableBody = () => {
                             <td className="under" onClick={() => dispatch(fetchSoldierById(soldier.superior))}> 
                                 {soldier.superior_name} 
                             </td>
-                            <td className="under" onClick={() => dispatch(fetchDirectSubordinates_BySuperiorID(soldier.id))}> 
+                            <td className="under" onClick={() => dispatch(fetchSoldiers({superior_id: soldier.id}))}> 
                                 {soldier.ds_num !== 0 && soldier.ds_num} 
                             </td>
                             <td onClick={handleEditSolderClick}> Edit </td>

@@ -3,7 +3,8 @@ import axios from 'axios';
 const url = "http://localhost:8000/soldiers/";
 const initialState = {
     soldiers: [],
-    sortField: '',
+    superior_id: undefined,
+    sortField: undefined,
     order: 'default',
     status: 'idle',
     error: null
@@ -20,12 +21,13 @@ export const addSoldier = createAsyncThunk('soldiers/addSoldier', async (soldier
 //fetch the soldier based on sortfield, sortOrder and need to skip number
 export const fetchSoldiers = createAsyncThunk('soldiers/fetchSoldiers', async (props) => {
     console.log(props);
-    const {sortField = "", order = "", skip = 0} = props;
-    console.log("sortField: " + sortField.toString() + ", sortOrder: " + order.toString() + ", skip:" + +skip);
+    const {superior_id = undefined, sortField = undefined, order = "default", skip = 0} = props;
+    //console.log("sortField: " + sortField.toString() + ", sortOrder: " + order.toString() + ", skip:" + skip);
     const apiUrl =  `${url}fetchSoldiers?` + 
-        (sortField !== undefined && `sortField=${sortField}`) + 
-        (order !== undefined && `&order=${order}`) + 
-        (skip !== undefined && `&skip=${skip}`);
+        (superior_id !== undefined ? `superior_id=${superior_id}` : '') + 
+        (sortField !== undefined ? `&sortField=${sortField}` : '') + 
+        (order !== undefined ? `&order=${order}` : '') + 
+        (skip !== undefined ? `&skip=${skip}` : '');
     console.log("apiUrl:" + apiUrl);
     const response = await axios.get(apiUrl);
     //console.log(response.data);
@@ -48,13 +50,6 @@ export const fetchSoldierById = createAsyncThunk('soldiers/fetchSoldierById', as
     return response.data;
 });
 
-export const fetchDirectSubordinates_BySuperiorID = createAsyncThunk('soldiers/fetchDirectSubordinates', async (id) => {
-    const apiUrl =  `${url}fetchDirectSubordinates/${id}`;
-    console.log("apiUrl:" + apiUrl);
-    const response = await axios.get(apiUrl);
-    console.log(response.data);
-    return response.data;
-});
 
 const soldiersSlice = createSlice({
     name: 'soldiers',
@@ -73,8 +68,13 @@ const soldiersSlice = createSlice({
             
         },
         reset(state, action) {
-            state.sortField = '';
+            state.sortField = undefined;
             state.order = '';
+            state.superior_id = undefined;
+        },
+        changeSuperior_id(state, action) {
+            const { id } = action.payload;
+            state.superior_id = id;
         }
     },
     extraReducers: {
@@ -95,17 +95,6 @@ const soldiersSlice = createSlice({
             state.soldiers = [action.payload]
         },
         [fetchSoldierById.rejected]: (state, action) => {
-            state.status = 'failed'
-            state.soldiers.push(action.payload)
-        },
-        [fetchDirectSubordinates_BySuperiorID.pending]: (state, action) => {
-            state.status = 'loading'
-        },
-        [fetchDirectSubordinates_BySuperiorID.fulfilled]: (state, action) => {
-            state.status = 'succeeded'
-            state.soldiers = action.payload
-        },
-        [fetchDirectSubordinates_BySuperiorID.rejected]: (state, action) => {
             state.status = 'failed'
             state.soldiers.push(action.payload)
         },
