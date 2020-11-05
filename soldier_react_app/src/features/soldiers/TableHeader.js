@@ -4,17 +4,12 @@ import { changeSoldierOrder, fetchSoldiers } from './SoldiersSlice';
 
 const TableHeader = () => {
     const dispatch = useDispatch();
-    const soldiersOrder = useSelector((state) => state.soldiers.order);
-
-    const sortSoldiersByName = () => {
-        
-        let changedOrder = 'asc';
-        if (soldiersOrder === 'asc') {
-            changedOrder = 'dsc';
-        }
-        console.log("soldier order: " + soldiersOrder + ", order: " + changedOrder);
-        dispatch(changeSoldierOrder({order: changedOrder}));
-        dispatch(fetchSoldiers(changedOrder));
+    const order = useSelector((state) => state.soldiers.order);
+    const sortField = useSelector((state) => state.soldiers.sortField);
+    const changeSortFieldAndOrder = (field) => {
+        dispatch(changeSoldierOrder({sortField : field}));
+        console.log('fieldName: ' + sortField + ', order: ' + order);
+        dispatch(fetchSoldiers({sortField : field, order: order}));
     }
 
     
@@ -22,14 +17,14 @@ const TableHeader = () => {
         <thead>
             <tr>
                 <th> Avatar </th>
-                <th onClick={sortSoldiersByName}> Name <i class='fas fa-sort'></i></th>
-                <th> Sex </th>
-                <th> Rank </th>
-                <th> Start Date </th>
-                <th> Phone </th>
-                <th> Email </th>
-                <th> Superior </th>
-                <th> # of D.S. </th>
+                <th onClick={() => changeSortFieldAndOrder('name')}> Name </th>
+                <th onClick={() => changeSortFieldAndOrder('sex')}> Sex </th>
+                <th onClick={() => changeSortFieldAndOrder('rank')}> Rank </th>
+                <th onClick={() => changeSortFieldAndOrder('startDate')}> Start Date </th>
+                <th onClick={() => changeSortFieldAndOrder('phone')}> Phone </th>
+                <th onClick={() => changeSortFieldAndOrder('email')}> Email </th>
+                <th onClick={() => changeSortFieldAndOrder('superior')}> Superior </th>
+                <th onClick={() => changeSortFieldAndOrder('ds_num')}> # of D.S. </th>
                 <th> Edit </th>
                 <th> Delete </th>
             </tr>
@@ -38,3 +33,4 @@ const TableHeader = () => {
 }
 
 export default TableHeader;
+//<i class='fas fa-sort'></i>

@@ -6,8 +6,8 @@ import reportWebVitals from './reportWebVitals';
 import store from './app/store'
 import { Provider } from 'react-redux'
 import { fetchSoldiers } from './features/soldiers/SoldiersSlice';
-
-store.dispatch(fetchSoldiers('default'));
+//{sortField: 'name', order: 'asc', skip: 2}
+store.dispatch(fetchSoldiers({}));
 
 ReactDOM.render(
   <React.StrictMode>

@@ -3,11 +3,12 @@ import axios from 'axios';
 const url = "http://localhost:8000/soldiers/";
 const initialState = {
     soldiers: [],
+    sortField: '',
     order: 'default',
     status: 'idle',
     error: null
 }
-
+//create and add a new soldier
 export const addSoldier = createAsyncThunk('soldiers/addSoldier', async (soldier) => {
     const apiUrl =  `${url}addNewSoldier/`;
     console.log("apiUrl:" + apiUrl);
@@ -16,19 +17,26 @@ export const addSoldier = createAsyncThunk('soldiers/addSoldier', async (soldier
     return soldier;
 });
 
-export const fetchSoldiers = createAsyncThunk('soldiers/fetchSoldiers', async (order, skip = 0) => {
-    skip = 0
-    const apiUrl =  `${url}fetchSoldiers/${order}?skip=${skip}`;
+//fetch the soldier based on sortfield, sortOrder and need to skip number
+export const fetchSoldiers = createAsyncThunk('soldiers/fetchSoldiers', async (props) => {
+    console.log(props);
+    const {sortField = "", order = "", skip = 0} = props;
+    console.log("sortField: " + sortField.toString() + ", sortOrder: " + order.toString() + ", skip:" + +skip);
+    const apiUrl =  `${url}fetchSoldiers?` + 
+        (sortField !== undefined && `sortField=${sortField}`) + 
+        (order !== undefined && `&order=${order}`) + 
+        (skip !== undefined && `&skip=${skip}`);
     console.log("apiUrl:" + apiUrl);
     const response = await axios.get(apiUrl);
-    console.log(response.data);
+    //console.log(response.data);
     return response.data;
 });
 
+//delete soldier based on its id
 export const deleteSoldierById = createAsyncThunk('soldiers/deleteSoldierById', async (id) => {
     const apiUrl =  `${url}deleteSoldier/${id}`;
     console.log("apiUrl:" + apiUrl);
-    const response = await axios.delete(apiUrl);
+    await axios.delete(apiUrl);
     return id;
 });
 
@@ -52,15 +60,21 @@ const soldiersSlice = createSlice({
     name: 'soldiers',
     initialState,
     reducers: {
-        soldierAdded(state, action) {
-
-        },
-        soldierEdited(state, action) {
-
-        },
         changeSoldierOrder(state, action) {
-            const { order } = action.payload;
-            state.order = order;
+            const { sortField } = action.payload;
+            console.log('state.sortField: ' + state.sortField + ', sortField: ' + sortField);
+            if (state.sortField === sortField) {
+                state.order = state.order === 'asc' ? 'desc' : 'asc';
+            } else {
+                state.sortField = sortField;
+                state.order = 'asc';
+            }
+            console.log('state.sortField: ' + state.sortField + ', state.order: ' + state.order);
+            
+        },
+        reset(state, action) {
+            state.sortField = '';
+            state.order = '';
         }
     },
     extraReducers: {
@@ -106,7 +120,7 @@ const soldiersSlice = createSlice({
     }
 })
 
-export const { soldierEdited, changeSoldierOrder } = soldiersSlice.actions;
+export const { changeSoldierOrder, reset } = soldiersSlice.actions;
 
 export default soldiersSlice.reducer;
 

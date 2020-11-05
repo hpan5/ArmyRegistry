@@ -8,18 +8,23 @@ const router = express.Router();
 const LIMIT_PER_DOC = 20;
 //GET 
 //fetch all soldiers with three states of order: default, ascending, descending
-router.get('/fetchSoldiers/:order', async (req, res) => {
+router.get('/fetchSoldiers', async (req, res) => {
     let soldiers;
-    let order = req.params.order.toString();
+
+    let sortField = isDefined(req.query.sortField) && req.query.sortField.toString();
+    let order = isDefined(req.query.order) ? req.query.order.toString() : 'default';
     const skip =
       req.query.skip && /^\d+$/.test(req.query.skip) ? Number(req.query.skip) : 0;
+    console.log("sortField:" + sortField + ", sortOrder: " + order + "skip:" + skip);
     try {
-        if (order == "default") {
+        if (order === "default") {
             soldiers = await Soldier.find({}, undefined, { skip, limit: LIMIT_PER_DOC });
         } else if (order === "asc") {
-            soldiers = await Soldier.find({}, undefined, { skip, limit: LIMIT_PER_DOC }).sort( {name: 1} );
-        } else if (order == "dsc") {
-            soldiers = await Soldier.find({}, undefined, { skip, limit: LIMIT_PER_DOC }).sort( {name: -1} );
+            console.log("ascending");
+            soldiers = await Soldier.find({}, undefined, { skip, limit: LIMIT_PER_DOC }).sort(`${sortField}`);
+        } else if (order === "desc") {
+            console.log("descending");
+            soldiers = await Soldier.find({}, undefined, { skip, limit: LIMIT_PER_DOC }).sort( `-${sortField}` );
         } else {
             res.status(404).send({error: "not valid order input"});
         }
@@ -80,7 +85,8 @@ router.post('/addNewSoldier', bodyParser.urlencoded({ extended: false}), async (
         email: req.body.email,
         superior: req.body.superior,
         superior_name: req.body.superior_name,
-        direct_subordinates: []
+        direct_subordinates: [],
+        ds_num: 0
     })
     await newSoilder.save(async (err) => {
         if (err) res.status(404).send(err);
@@ -149,10 +155,22 @@ router.delete("/deleteSoldier/:id", async (req, res) => {
     try {
         const soldier_toBeDeleted = await Soldier.findById(req.params.id);
         if (!isUndefined(soldier_toBeDeleted.superior)) {
+            //delete self from superior's direct subroutine list
             deleteDirectSubroutine(soldier_toBeDeleted.superior, soldier_toBeDeleted._id);
         }
+        //go to the it's own direct subroutine and reset all of their superior to undefined
+        //console.log("before looping through soldier's ds")
+        //console.log(soldier_toBeDeleted.direct_subordinates);
+        for (let ds_id of soldier_toBeDeleted.direct_subordinates) {
+            let id = ds_id.toString();
+            let subordinate = await Soldier.findById(id);
+            subordinate.superior = undefined;
+            subordinate.superior_name = undefined;
+            await subordinate.save();
+        }
         await Soldier.deleteOne(soldier_toBeDeleted);
-        res.status(204).send("successfully deleted");
+        //console.log("successfully deleted");
+        res.status(204).send({message: "successfully deleted"});
     } catch (err) {
         res.status(404).send({error: "problem deleting soldier"});
     }
@@ -194,6 +212,7 @@ const deleteDirectSubroutine = async (superior_id, soldier_id) => {
         })
         if (found) {
             superior.direct_subordinates.splice(index, 1);
+            superior.ds_num = superior.direct_subordinates.length;
         } else {
             console.log(" direct subroutine not existed");
         }
@@ -209,6 +228,7 @@ const addDirectSubroutine = async (superior_id, soldier_id) => {
     try {
         const superior = await Soldier.findById(superior_id);
         superior.direct_subordinates.push(soldier_id);
+        superior.ds_num = superior.direct_subordinates.length;
         await superior.save();
         console.log("superior's name is:" + superior.name);
     } catch(error) {

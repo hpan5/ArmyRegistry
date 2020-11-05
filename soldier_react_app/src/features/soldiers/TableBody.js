@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectAllSoldiers, fetchSoldiers, fetchSoldierById, fetchDirectSubordinates_BySuperiorID } from './SoldiersSlice'
-import InfiniteScroll from "react-infinite-scroll-component";
 import { useHistory } from 'react-router-dom';
 
 const TableBody = () => {
@@ -10,7 +9,6 @@ const TableBody = () => {
     const soldiersStatus = useSelector((state) => state.soldiers.status);
     const soldiersOrder = useSelector((state) => state.soldiers.order);
     const history = useHistory();
-    const [hasMore, setHasMore] = useState(true);
     useEffect(() => {
         if (soldiersStatus === 'idle') {
             dispatch(fetchSoldiers(soldiersOrder));
@@ -35,10 +33,7 @@ const TableBody = () => {
             </tr>
         );
     } else {
-        console.log("about to render list:", soldiers);
-        if (soldiers.length === 0) {
-            setHasMore(false);
-        }
+        //console.log("about to render list:", soldiers);
         content = (
             soldiers.map((soldier, i) => {
                 return (
@@ -54,7 +49,7 @@ const TableBody = () => {
                                 {soldier.superior_name} 
                             </td>
                             <td className="under" onClick={() => dispatch(fetchDirectSubordinates_BySuperiorID(soldier.id))}> 
-                                {soldier.direct_subordinates && soldier.direct_subordinates.length !== 0 && soldier.direct_subordinates.length} 
+                                {soldier.ds_num !== 0 && soldier.ds_num} 
                             </td>
                             <td onClick={handleEditSolderClick}> Edit </td>
                             <td> Delete </td>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import '../../styles/SearchResetAddBar.css';
-import { changeSoldierOrder, fetchSoldiers } from './SoldiersSlice';
+import { reset, fetchSoldiers } from './SoldiersSlice';
 import { useHistory } from 'react-router-dom';
 
 const SearchResetAddBar = () => {
@@ -9,8 +9,8 @@ const SearchResetAddBar = () => {
     const dispatch = useDispatch();
 
     const resetSoldierOrder = () => {
-        dispatch(changeSoldierOrder({order: 'default'}));
-        dispatch(fetchSoldiers('default'));
+        dispatch(reset());
+        dispatch(fetchSoldiers({}));
     }
 
     const handleNewSoldierClick = () => {
