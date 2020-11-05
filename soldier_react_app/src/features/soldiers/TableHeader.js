@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { changeSoldierOrder, fetchSoldiers } from './SoldiersSlice';
 
@@ -9,9 +9,12 @@ const TableHeader = () => {
     const changeSortFieldAndOrder = (field) => {
         dispatch(changeSoldierOrder({sortField : field}));
         console.log('fieldName: ' + sortField + ', order: ' + order);
-        dispatch(fetchSoldiers({sortField : field, order: order}));
+        
     }
-
+    
+    useEffect(() => {
+        dispatch(fetchSoldiers({sortField : sortField, order: order}));
+    },[dispatch, sortField, order]);
     
     return (
         <thead>

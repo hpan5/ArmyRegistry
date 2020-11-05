@@ -1,5 +1,4 @@
 import React from 'react';
-import './App.css';
 import {BrowserRouter as Router,  Route } from 'react-router-dom';
 import SoldierHome from './features/soldiers/SoldierHome';
 import AddSolder from './features/soldiers/AddSolder';

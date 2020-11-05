@@ -37,7 +37,7 @@ const TableBody = () => {
         content = (
             soldiers.map((soldier, i) => {
                 return (
-                        <tr className="users" key={soldier.id}>
+                        <tr key={soldier.id}>
                             <td> Avatar </td>
                             <td> {soldier.name} </td>
                             <td> {soldier.sex} </td>
