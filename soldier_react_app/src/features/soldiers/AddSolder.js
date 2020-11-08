@@ -8,12 +8,12 @@ const AddSolder = () => {
     const dispatch = useDispatch();
     const history = useHistory();
     const handleSubmit = (soldier) => {
-        /*dispatch(addSoldier(soldier)).
-            then(() => {
+        console.log("submitting", soldier);
+        dispatch(addSoldier(soldier)).then(() => {
+            dispatch(fetchSoldiers({})).then(() => {
                 history.goBack();
-            })*/
-
-            console.log("submitting")
+            })
+        })
     }
 
     const handleCancel = () => {

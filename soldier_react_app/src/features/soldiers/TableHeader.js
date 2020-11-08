@@ -6,6 +6,7 @@ const TableHeader = () => {
     const dispatch = useDispatch();
     const order = useSelector((state) => state.soldiers.order);
     const sortField = useSelector((state) => state.soldiers.sortField);
+    const superiorId = useSelector((state) => state.soldiers.superior_id);
     const changeSortFieldAndOrder = (field) => {
         dispatch(changeSoldierOrder({sortField : field}));
         console.log('fieldName: ' + sortField + ', order: ' + order);
@@ -13,8 +14,8 @@ const TableHeader = () => {
     }
     
     useEffect(() => {
-        dispatch(fetchSoldiers({sortField : sortField, order: order}));
-    },[dispatch, sortField, order]);
+        dispatch(fetchSoldiers({superior_id: superiorId, sortField : sortField, order: order}));
+    },[dispatch, superiorId, sortField, order]);
     
     return (
         <thead>

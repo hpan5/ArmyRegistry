@@ -6,6 +6,7 @@ const Schema = mongoose.Schema;
 const moment = require('moment');
 const { json } = require('express');
 var aggregatePaginate = require('mongoose-aggregate-paginate-v2');
+var Deque = require("collections/deque");
 const router = express.Router();
 const LIMIT_PER_DOC = 20;
 //GET 
@@ -78,6 +79,48 @@ router.get('/fetchSoldiers', async (req, res) => {
         res.status(404).send({error: "failed to fetch soldiers"});
     }
 })
+
+router.get('/fetchSuperiorCandidates', async (req, res) => {
+    let id = req.query.id;
+    try {
+        let superiorCandidates;
+        if (isUndefined(id)) {
+            superiorCandidates = await Soldier.find({});
+            res.send(superiorCandidates);
+        } else {
+            superiorCandidates = await getAllValidSuperiorCandidatesById(id);
+            res.send(superiorCandidates);
+        }
+    } catch (error) {
+        res.status(404).send({error : {error}});
+    }
+});
+//do bfs to get all of the children's id, find all the soldiers that are not in the array'
+//initialization: push to the end(current id)
+//expansion
+//save each poped id to an array, find curSoldier's direct subordinates by searching for the superior_id,
+//push all of them to the end of queue
+//termination: stop when queue is empty, by this time, all subordinates of the soldier should stored in the array
+
+//check through all the soldiers, return all of them except for the one in the array
+const getAllValidSuperiorCandidatesById = async (id) => {
+    let queue = new Deque();
+    let childrenArray = [];
+    queue.push(id);
+    while (queue.length !== 0) {
+        let curId = queue.shift();
+        let curSoldier = await Soldier.findById(curId);
+        childrenArray.push(curId);
+        let curChildren = await Soldier.find({superior: curId});
+        for (let child of curChildren) {
+            queue.push(child._id);
+        }
+        console.log("curChildren.length" + curChildren.length + ", queue.length" + queue.length);
+    }
+    console.log(childrenArray);
+    let validSuperiorCandidates = await Soldier.find({_id: {$nin: childrenArray}});
+    return validSuperiorCandidates;
+}
 
 //get subordinates based on id
 router.get('/fetchDirectSubordinates/:id', async (req, res) => {

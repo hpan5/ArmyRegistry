@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import '../../styles/SearchResetAddBar.css';
-import { reset, fetchSoldiers } from './SoldiersSlice';
+import { reset, fetchSoldiers, fetchSuperiorCandidates } from './SoldiersSlice';
 import { useHistory } from 'react-router-dom';
 
 const SearchResetAddBar = () => {
@@ -13,8 +13,10 @@ const SearchResetAddBar = () => {
         dispatch(fetchSoldiers({}));
     }
 
-    const handleNewSoldierClick = () => {
-        history.push('/AddSolder');
+    const handleNewSoldierClick = async () => {
+        dispatch(fetchSuperiorCandidates({})).then(
+            () => history.push('/AddSolder')
+        )
     }
 
     return (

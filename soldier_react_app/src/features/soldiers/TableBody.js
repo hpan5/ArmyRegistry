@@ -1,32 +1,52 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectAllSoldiers, fetchSoldiers, fetchSoldierById } from './SoldiersSlice'
+import { addEditingUser, fetchSuperiorCandidates, selectAllSoldiers, fetchSoldiers, fetchSoldierById, deleteSoldierById, setNewSuperiorId } from './SoldiersSlice'
 import { useHistory } from 'react-router-dom';
 
 const TableBody = () => {
     const dispatch = useDispatch();
     const soldiers = useSelector(selectAllSoldiers);
-    const soldiersStatus = useSelector((state) => state.soldiers.status);
-    const soldiersOrder = useSelector((state) => state.soldiers.order);
+    const globalStatus = useSelector((state) => state.soldiers.status);
+    const globalOrder = useSelector((state) => state.soldiers.order);
+    const globalSortField = useSelector((state) => state.soldiers.sortField);
+    const globalSuperiorId = useSelector((state) => state.soldiers.superior_id);
     const history = useHistory();
     useEffect(() => {
-        if (soldiersStatus === 'idle') {
-            dispatch(fetchSoldiers(soldiersOrder));
+        if (globalStatus === 'idle') {
+            dispatch(fetchSoldiers({superior_id: globalSuperiorId, sortField: globalSortField, order: globalOrder}));
         }
-    },[dispatch, soldiersStatus, soldiersOrder]);
+    },[dispatch, globalStatus, globalSuperiorId, globalSortField, globalOrder]);
 
-    const handleEditSolderClick = () => {
-        history.push('/EditSolder');
+    const handleEditSolderClick = (editingSoldier) => {
+        
+        console.log("editing Soldier:" + editingSoldier);
+        dispatch(addEditingUser({ editingSoldier }))
+        dispatch(fetchSuperiorCandidates({id: editingSoldier.id})).then(
+            () => history.push('/EditSolder')
+        )
     }
 
+    const handleDeleteSoldierClick = (props) => {
+        const { id } = props;
+        console.log("id:" + id);
+        dispatch(addEditingUser())
+        dispatch(deleteSoldierById(id)).then(() => {
+            dispatch(fetchSoldiers({superior_id: globalSuperiorId, sortField: globalSortField, order: globalOrder}));
+        })
+    }
+    const handleDSNumClick = (props) => {
+        const { id } = props;
+        dispatch(setNewSuperiorId({superior_id: id}));
+        dispatch(fetchSoldiers({superior_id: id}));
+    }
     let content;
-    if (soldiersStatus === 'loading') {
+    if (globalStatus === 'loading') {
         content = (
             <tr>
                 <td> Loading </td>
             </tr>
         );
-    } else if (soldiersStatus === 'failed') {
+    } else if (globalStatus === 'failed') {
         content = (
             <tr>
                 <td> error fetching table </td>
@@ -48,11 +68,11 @@ const TableBody = () => {
                             <td className="under" onClick={() => dispatch(fetchSoldierById(soldier.superior._id))}> 
                                 {soldier.superior && soldier.superior.name} 
                             </td>
-                            <td className="under" onClick={() => dispatch(fetchSoldiers({superior_id: soldier.id}))}> 
+                            <td className="under" onClick={() => handleDSNumClick({id: soldier.id})}> 
                                 {soldier.ds_num !== 0 && soldier.ds_num} 
                             </td>
-                            <td onClick={handleEditSolderClick}> Edit </td>
-                            <td> Delete </td>
+                            <td onClick={() => handleEditSolderClick(soldier)}> Edit </td>
+                            <td onClick={() => handleDeleteSoldierClick(soldier.id)}> Delete </td>
                         </tr>
                 )   
             })

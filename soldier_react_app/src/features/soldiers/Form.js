@@ -1,8 +1,20 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { connect } from 'react-redux';
 import { Field, reduxForm } from 'redux-form'
-
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchSuperiorCandidates } from './SoldiersSlice';
 let SoldierForm = (props) => {
   const { handleSubmit, valid, onCancel } = props
+  const dispatch = useDispatch();
+  const superiorCandidates = useSelector((state) => state.soldiers.superiorCandidates);
+  const editingSoldier = useSelector((state) => state.soldiers.editingSoldier);
+  
+  useEffect(() => {
+    if (superiorCandidates === undefined || superiorCandidates.length === 0) {
+      dispatch(fetchSuperiorCandidates({}));
+    }
+  }, [dispatch, superiorCandidates]);
+  console.log(superiorCandidates);
   return (
     <form onSubmit={handleSubmit} >
         <div>
@@ -11,7 +23,17 @@ let SoldierForm = (props) => {
         </div>
         <div>
             <label htmlFor="rank"> Rank: </label>
-            <Field name="rank" id="rank" component={newField} type="text" />
+            <Field name="rank" id="rank" component="select">
+              <option />
+              {
+                rankOptions.map((rankOption, i) => {
+                  return (
+                    <option key={i} value={rankOption}> { rankOption } </option>
+                    
+                  )
+                })
+              }
+            </Field>
         </div>
         <div>
             <label htmlFor="sex"> Sex: </label>
@@ -25,8 +47,12 @@ let SoldierForm = (props) => {
             </label>
         </div>
         <div>
-            <label htmlFor="phone"> Office Phone: </label>
+            <label htmlFor="startDate"> startDate: </label>
             <Field name="startDate" id="startDate" component={newField} type="text" />
+        </div>
+        <div>
+            <label htmlFor="phone"> Office Phone: </label>
+            <Field name="phone" id="phone" component={newField} type="text" />
         </div>
         <div>
             <label htmlFor="email"> Email: </label>
@@ -36,9 +62,14 @@ let SoldierForm = (props) => {
             <label htmlFor="Superior"> Superior: </label>
             <Field name="superior" id="superior" component="select">
               <option />
-              <option value="#ff0000">Red</option>
-              <option value="#00ff00">Green</option>
-              <option value="#0000ff">Blue</option>
+              {
+                superiorCandidates.map((candidate, i) => {
+                  return (
+                    <option key={i} value={candidate.id}> { candidate.name } </option>
+                    
+                  )
+                })
+              }
             </Field>
         </div>
         <button type="submit" disabled={!valid}> Save </button>
@@ -49,6 +80,27 @@ let SoldierForm = (props) => {
 
 const myValidator = values => {
   const errors = {};
+  if (!values.name) {
+    errors.name = "Name is required";
+  }
+  if (!values.rank) {
+    errors.rank = "Rank is required";
+  }
+  if (!values.sex) {
+    errors.sex = "Sex is required";
+  }
+  if (!values.startDate) {
+    errors.startDate = "StartDate is required";
+  } //need regex check
+  if (!values.phone) {
+    errors.phone = "Phone is required";
+  } //need regex check
+  if (!values.email) {
+    errors.email = 'An email is required';
+  } else if (!/(.+)@(.+){1,}\.(.+){1,}/i.test(values.email)) {
+    // use a more robust RegEx in real-life scenarios
+    errors.email = 'Valid email is required';
+  }
   return errors;
 };
 
@@ -74,5 +126,13 @@ SoldierForm = reduxForm({
   enableReinitialize: true
 })(SoldierForm)
 
+SoldierForm = connect(
+  state => ({
+    initialValues: state.soldiers.editingSoldier
+  })
+)(SoldierForm)
+
+const rankOptions = ["General", "Colonel", "Major", "Captain", "Lieutenant", "Warrant Officer",
+"Sergeant", "Corporal", "Specialist", "Private"];
 export default SoldierForm;
 
