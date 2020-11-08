@@ -5,7 +5,7 @@ const initialState = {
     soldiers: [],
     superior_id: undefined,
     sortField: undefined,
-    order: 'default',
+    order: '',
     status: 'idle',
     error: null
 }
@@ -21,7 +21,7 @@ export const addSoldier = createAsyncThunk('soldiers/addSoldier', async (soldier
 //fetch the soldier based on sortfield, sortOrder and need to skip number
 export const fetchSoldiers = createAsyncThunk('soldiers/fetchSoldiers', async (props) => {
     console.log(props);
-    const {superior_id = undefined, sortField = undefined, order = "default", skip = 0} = props;
+    const {superior_id = undefined, sortField = undefined, order = "", skip = 0} = props;
     //console.log("sortField: " + sortField.toString() + ", sortOrder: " + order.toString() + ", skip:" + skip);
     const apiUrl =  `${url}fetchSoldiers?` + 
         (superior_id !== undefined ? `superior_id=${superior_id}` : '') + 
@@ -105,6 +105,15 @@ const soldiersSlice = createSlice({
         [addSoldier.rejected]: (state, action) => {
             state.status = 'failed'
             state.soldiers.push(action.payload)
+        },
+        [deleteSoldierById.fulfilled]: (state, action) => {
+            state.status = 'succeeded';
+            let listAfterDeleted = state.soldiers.filter((soldier) => soldier.id !== action.id);
+            state.soldiers = listAfterDeleted;
+        },
+        [deleteSoldierById.rejected]: (state, action) => {
+            state.status = 'failed'
+            //state.soldiers.push(action.payload)
         }
     }
 })

@@ -15,7 +15,14 @@ let SoldierForm = (props) => {
         </div>
         <div>
             <label htmlFor="sex"> Sex: </label>
-            <Field name="sex" id="sex" component={newField} type="text" />
+            <label>
+              <Field name="sex" component="input" type="radio" value="M" />{' '}
+                Male
+            </label>
+            <label>
+              <Field name="sex" component="input" type="radio" value="F" />{' '}
+                Famale
+            </label>
         </div>
         <div>
             <label htmlFor="phone"> Office Phone: </label>
@@ -26,8 +33,13 @@ let SoldierForm = (props) => {
             <Field name="email" id="email" component={newField} type="text" />
         </div>
         <div>
-            <label htmlFor="supervisor"> Supervisor: </label>
-            <Field name="supervisor" id="supervisor" component={newField} type="text" />
+            <label htmlFor="Superior"> Superior: </label>
+            <Field name="superior" id="superior" component="select">
+              <option />
+              <option value="#ff0000">Red</option>
+              <option value="#00ff00">Green</option>
+              <option value="#0000ff">Blue</option>
+            </Field>
         </div>
         <button type="submit" disabled={!valid}> Save </button>
         <button type="button" onClick={onCancel}> Cancel </button>
@@ -57,7 +69,7 @@ const newField = ({
 };
 
 SoldierForm = reduxForm({
-  form: 'user',
+  form: 'soldier',
   validate: myValidator,
   enableReinitialize: true
 })(SoldierForm)

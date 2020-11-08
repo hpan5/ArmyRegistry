@@ -2,89 +2,79 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const Soldier = require('./models/Soldier');
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 const moment = require('moment');
 const { json } = require('express');
+var aggregatePaginate = require('mongoose-aggregate-paginate-v2');
 const router = express.Router();
 const LIMIT_PER_DOC = 20;
 //GET 
+/*const getDirectSubroutines = (superior_id, sortField, order, skip) => {
+    if (sortField == '')
+}*/
+
 //fetch all soldiers with three states of order: default, ascending, descending
 router.get('/fetchSoldiers', async (req, res) => {
     
     let superior_id = isDefined(req.query.superior_id) && String(req.query.superior_id);
     let sortField = isDefined(req.query.sortField) && String(req.query.sortField);
-    let order = isDefined(req.query.order) ? String(req.query.order) : 'default';
+    let order = isDefined(req.query.order) ? String(req.query.order) : '';
+    let filter = isDefined(req.query.filter) ? req.query.filter.toString() : '';
     const skip =
       req.query.skip && /^\d+$/.test(req.query.skip) ? Number(req.query.skip) : 0;
-    console.log("sortField:" + sortField + ", sortOrder: " + order + ", skip:" + skip);
-    console.log("type of sortField: " + typeof sortField);
-
+    console.log("sortField:" + sortField + ", sortOrder: " + order + ", skip:" + skip + ", filter: " + `/${filter}/`);
+    //console.log("type of sortField: " + typeof sortField);
+    //const sortType = sortField === 'direct_subordinates' ? 'sortByCount' : "sort";
+    //console.log("sortType:"  + sortType);
+    //if sortfield === direct_subordinates, set aggregate separately
+    
     try {
-        if (isDefined(req.query.superior_id)) {
-            //find direct subordinates for the solder with the provided superior_id
-            console.log("looking for all direct subordinates for the solder with the provided superior_id")
-            let direct_subordinates;
-            console.log("looking for a superior's direct subordinates");
-            const superior = await Soldier.findById(superior_id);
-            if (order === "default") {
-                const populated_soldier = await superior.
-                populate({
-                    path: 'direct_subordinates', 
-                    options: {
-                        skip, 
-                        limit: LIMIT_PER_DOC 
-                    }
-                }).
-                execPopulate();;
-                direct_subordinates = populated_soldier.direct_subordinates;
-            } else if (order === "asc") {
-                console.log("ascending");
-                const populated_soldier = await superior.
-                populate({
-                    path: 'direct_subordinates', 
-                    options: {
-                        sort: {[sortField] : 1},
-                        skip, 
-                        limit: LIMIT_PER_DOC 
-                    }
-                }).
-                execPopulate();;
-                direct_subordinates = populated_soldier.direct_subordinates;
-            } else if (order === "desc") {
-                console.log("descending");
-                //let descSort = {`${sortField}` : -1};
-                const populated_soldier = await superior.
-                populate({
-                    path: 'direct_subordinates', 
-                    options: {
-                        sort: {[sortField] : -1},
-                        skip, 
-                        limit: LIMIT_PER_DOC 
-                    }
-                }).
-                execPopulate();;
-                direct_subordinates = populated_soldier.direct_subordinates;
-            } else {
-                res.status(404).send({error: "not valid order input"});
-            }
-            res.send(direct_subordinates);
-        } else {
-            let soldiers;
-            console.log("looking for all soldiers")
-            if (order === "default") {
-                soldiers = await Soldier.find({}, undefined, { skip, limit: LIMIT_PER_DOC });
-            } else if (order === "asc") {
-                console.log("ascending");
-                soldiers = await Soldier.find({}, undefined, { sort: {[sortField] : 1}, skip, limit: LIMIT_PER_DOC });
-            } else if (order === "desc") {
-                console.log("descending");
-                soldiers = await Soldier.find({}, undefined, { sort: {[sortField] : -1}, skip, limit: LIMIT_PER_DOC }).sort( `-${sortField}` );
-            } else {
-                res.status(404).send({error: "not valid order input"});
-            }
-            res.send(soldiers);
+        const options = {
+            sort: {[sortField] : order},
+            populate: 'superior',
+            offset: skip,
+            limit: 10
         }
-        
+        if (isUndefined(superior_id)) {
+            let filterQuery = isUndefined(req.query.filter) ? {} : 
+            {
+                $or: [
+                    {name : new RegExp(filter, 'i')},
+                    {rank : new RegExp(filter, 'i')},
+                    {sex : new RegExp(filter, 'i')},
+                    {startDate : new RegExp(filter, 'i')},
+                    {phone : new RegExp(filter, 'i')},
+                    {email : new RegExp(filter, 'i')},
+                    {ds_num : {$eq : isInteger(filter) ? +filter : Number.MAX_SAFE_INTEGER}}
+                ]
+            };
+            let soldiers = await Soldier.paginate(filterQuery, options, (err, result) => {
+                res.send(result.docs);
+            })
+        } else {
+            console.log("looking for direct subordinates");
+            let filterQuery = isUndefined(req.query.filter) ? {superior: superior_id} : 
+            {
+                $and: [
+                    {superior: superior_id},
+                    {$or: [
+                        {name : new RegExp(filter, 'i')},
+                        {rank : new RegExp(filter, 'i')},
+                        {sex : new RegExp(filter, 'i')},
+                        {startDate : new RegExp(filter, 'i')},
+                        {phone : new RegExp(filter, 'i')},
+                        {email : new RegExp(filter, 'i')},
+                        {ds_num : {$eq : isInteger(filter) ? +filter : Number.MAX_SAFE_INTEGER}}
+                    ]}
+                ]
+                
+            };
+            let soldiers = await Soldier.paginate(filterQuery, options, (error, result) => {
+                res.send(result.docs);
+            })
+        }
     } catch(error) {
+        console.log(error)
         res.status(404).send({error: "failed to fetch soldiers"});
     }
 })
@@ -141,9 +131,7 @@ router.post('/addNewSoldier', bodyParser.urlencoded({ extended: false}), async (
         phone: req.body.phone,
         email: req.body.email,
         superior: req.body.superior,
-        superior_name: req.body.superior_name,
-        direct_subordinates: [],
-        ds_num: 0
+        direct_subordinates: []
     })
     await newSoilder.save(async (err) => {
         if (err) res.status(404).send(err);
@@ -171,7 +159,7 @@ router.put('/editSoldier/:id', async (req, res) => {
         soldier.startDate = moment.utc(new Date(req.body.startDate)).format('L'); //might need validation
         soldier.phone = req.body.phone;
         soldier.email = req.body.email;
-        soldier.superior_name = req.body.superior_name;
+        soldier.ds_num = 0;
         //if superior has changed
         //case1: superior has change from undefined to defined
             //add self to new superior's subroutine
@@ -211,20 +199,33 @@ router.put('/editSoldier/:id', async (req, res) => {
 router.delete("/deleteSoldier/:id", async (req, res) => {
     try {
         const soldier_toBeDeleted = await Soldier.findById(req.params.id);
-        if (!isUndefined(soldier_toBeDeleted.superior)) {
-            //delete self from superior's direct subroutine list
-            deleteDirectSubroutine(soldier_toBeDeleted.superior, soldier_toBeDeleted._id);
+        console.log("soldier to be deleted found: " + soldier_toBeDeleted.name);
+        if (isUndefined(soldier_toBeDeleted.superior)) {
+            console.log("superior is undefined")
+            for (let ds_id of soldier_toBeDeleted.direct_subordinates) {
+                let id = ds_id.toString();
+                console.log("ds_id deleting: ", id);
+                let subordinate = await Soldier.findById(id);
+                subordinate.superior = undefined;
+                await subordinate.save();
+            }
+        } else {
+            console.log("superior is defined")
+            let superior_id = soldier_toBeDeleted.superior;
+            for (let ds_id of soldier_toBeDeleted.direct_subordinates) {
+                let id = ds_id.toString();
+                console.log("ds_id deleting: ", id);
+                let subordinate = await Soldier.findById(id);
+                subordinate.superior = superior_id;
+                addDirectSubroutine(superior_id, subordinate._id);
+                await subordinate.save();
+            }
+            deleteDirectSubroutine(superior_id, soldier_toBeDeleted._id);
         }
         //go to the it's own direct subroutine and reset all of their superior to undefined
         //console.log("before looping through soldier's ds")
         //console.log(soldier_toBeDeleted.direct_subordinates);
-        for (let ds_id of soldier_toBeDeleted.direct_subordinates) {
-            let id = ds_id.toString();
-            let subordinate = await Soldier.findById(id);
-            subordinate.superior = undefined;
-            subordinate.superior_name = undefined;
-            await subordinate.save();
-        }
+        
         await Soldier.deleteOne(soldier_toBeDeleted);
         //console.log("successfully deleted");
         res.status(204).send({message: "successfully deleted"});
@@ -243,6 +244,12 @@ router.delete("/deleteAll", async (req, res) => {
     }
 })
 
+const isInteger = (value) => {
+    if(parseInt(value,10).toString()===value) {
+      return true
+    }
+    return false;
+}
 //helper funct
 const isUndefined = (value) => {
     return (!value || typeof value == undefined || value === 'undefined' || value == null || value.length == 0 || value == "");
@@ -267,6 +274,7 @@ const deleteDirectSubroutine = async (superior_id, soldier_id) => {
                 return true;
             }
         })
+        console.log(superior.direct_subordinates);
         if (found) {
             superior.direct_subordinates.splice(index, 1);
             superior.ds_num = superior.direct_subordinates.length;
@@ -287,7 +295,6 @@ const addDirectSubroutine = async (superior_id, soldier_id) => {
         superior.direct_subordinates.push(soldier_id);
         superior.ds_num = superior.direct_subordinates.length;
         await superior.save();
-        console.log("superior's name is:" + superior.name);
     } catch(error) {
         console.log("add direct subroutine failed")
     }

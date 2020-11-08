@@ -7,7 +7,7 @@ import Form from './Form';
 const AddSolder = () => {
     const dispatch = useDispatch();
     const history = useHistory();
-    const submit = (soldier) => {
+    const handleSubmit = (soldier) => {
         /*dispatch(addSoldier(soldier)).
             then(() => {
                 history.goBack();
@@ -16,14 +16,14 @@ const AddSolder = () => {
             console.log("submitting")
     }
 
-    const cancel = () => {
+    const handleCancel = () => {
         console.log("cancelling");
         history.goBack();
     }
     return (
         <div>
            <h3>New Soldier</h3> 
-           <Form onSubmit={submit} onCancel={cancel}/>
+           <Form onSubmit={handleSubmit} onCancel={handleCancel}/>
         </div>
     );
 }

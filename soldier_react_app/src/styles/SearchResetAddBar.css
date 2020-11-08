@@ -1,12 +1,12 @@
-div {
+.bar {
     display: inline;
 }
 
-div form {
+.barForm {
     display: inline-block;
 }
 
-div button {
+.bar_button {
     display: inline-block;
     float: right;
 }

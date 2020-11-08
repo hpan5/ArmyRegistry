@@ -18,14 +18,14 @@ const SearchResetAddBar = () => {
     }
 
     return (
-        <div>
-            <form>
+        <div className="bar">
+            <form className="barForm">
                 <input type="text"/>
             </form>
-            <button onClick={resetSoldierOrder}>
+            <button onClick={resetSoldierOrder} className="bar_button">
                 Reset
             </button>
-            <button onClick={handleNewSoldierClick}>
+            <button onClick={handleNewSoldierClick} className="bar_button">
                 New Soldier
             </button>
         </div>

@@ -45,8 +45,8 @@ const TableBody = () => {
                             <td> {soldier.startDate} </td>
                             <td> {soldier.phone} </td>
                             <td> {soldier.email} </td>
-                            <td className="under" onClick={() => dispatch(fetchSoldierById(soldier.superior))}> 
-                                {soldier.superior_name} 
+                            <td className="under" onClick={() => dispatch(fetchSoldierById(soldier.superior._id))}> 
+                                {soldier.superior && soldier.superior.name} 
                             </td>
                             <td className="under" onClick={() => dispatch(fetchSoldiers({superior_id: soldier.id}))}> 
                                 {soldier.ds_num !== 0 && soldier.ds_num} 
