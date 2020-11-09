@@ -3,14 +3,12 @@ import { connect } from 'react-redux';
 import { Field, reduxForm, setSubmitFailed } from 'redux-form'
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchSuperiorCandidates } from './SoldiersSlice';
-import { Image } from "semantic-ui-react";
 import '../../styles/Form.css'
 let SoldierForm = (props) => {
-  const { handleSubmit, valid, onCancel, setImage} = props
+  const { handleSubmit, valid, onCancel} = props
   const dispatch = useDispatch();
   const superiorCandidates = useSelector((state) => state.soldiers.superiorCandidates);
   const editingSoldier = useSelector((state) => state.soldiers.editingSoldier);
-  const [imageUrl, setImageUrl] = useState('https://res.cloudinary.com/doris0411/image/upload/v1604876329/default_avatar_tyoesk.jpg');
   
   useEffect(() => {
     if (superiorCandidates === undefined || superiorCandidates.length === 0) {
@@ -19,61 +17,12 @@ let SoldierForm = (props) => {
   }, [dispatch, superiorCandidates]);
   //console.log(superiorCandidates);
 
-  const handleChange = (event, input) => {
-    //event.preventDefault();
-    const imageFile = event.target.files[0];
-    console.log("imageFile:" , imageFile);
-    //input.onChange(imageFile ? imageFile.name : undefined);
-    if (imageFile) {
-      const localImageUrl = URL.createObjectURL(imageFile);
-      const imageObject = new window.Image();
-      imageObject.onload = () => {
-        imageFile.width = imageObject.naturalWidth;
-        imageFile.height = imageObject.naturalHeight;
-        input.onChange(imageFile);
-        URL.revokeObjectURL(imageFile);
-      };
-      imageObject.src = localImageUrl;
-      console.log("imageFile: " , imageFile);
-      console.log("localImageUrl: " , localImageUrl);
-      //console.log("type of setImage: " , typeof setImage);
-      setImage(imageFile);
-      setImageUrl(localImageUrl);
-    }
-    //console.log(image);
-  }
-  const renderInput = ({ input, type, meta }) => {
-    console.log("input: " , input);
-    console.log("type: " , type);
-    console.log("meta: " , meta);
-    return (
-      <div>
-        <input
-          name={input.name}
-          type={type}
-          onChange={event => handleChange(event, input)}
-        />
-      </div>
-    );
-  };
-
 
   //<input type='file' name='image' onChange={onImageBrowse} />
   return (
     <form onSubmit={handleSubmit} >
       <button type="submit" disabled={!valid}> Save </button>
       <button type="button" onClick={onCancel}> Cancel </button>
-      <div className='left-container'>
-        <Image
-          src={imageUrl}
-          alt="preview"
-          className="preview-image"
-          style={{ height: "100px", objectFit: "cover" }}
-        />
-        <div>
-          <Field name="image" id="image" component={renderInput} type="file"/>
-        </div>
-      </div>
       <div className="right-container">
         <div>
           <label htmlFor="name"> Name: </label>
@@ -101,12 +50,12 @@ let SoldierForm = (props) => {
           </label>
           <label>
             <Field name="sex" component="input" type="radio" value="F" />{' '}
-              Famale
+              Female
           </label>
         </div>
 
         <div>
-          <label htmlFor="startDate"> startDate: </label>
+          <label htmlFor="startDate"> start Date: </label>
           <Field name="startDate" id="startDate" component={newField} type="text" />
         </div>
         
@@ -188,7 +137,7 @@ SoldierForm = reduxForm({
 
 SoldierForm = connect(
   state => ({
-    initialValues: state.soldiers.editingSoldier ? state.soldiers.editingSoldier : []
+    initialValues: state.soldiers.editingSoldier ? state.soldiers.editingSoldier : {}
   })
 )(SoldierForm)
 

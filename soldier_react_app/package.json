@@ -47,5 +47,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "https://api.cloudinary.com/v1_1/doris0411"
+  "proxy": "http://localhost:8000/"
 }

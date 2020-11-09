@@ -26,10 +26,9 @@ const TableBody = () => {
         )
     }
 
-    const handleDeleteSoldierClick = (props) => {
-        const { id } = props;
+    const handleDeleteSoldierClick = (id) => {
+        //const { id } = props;
         console.log("id:" + id);
-        dispatch(addEditingUser())
         dispatch(deleteSoldierById(id)).then(() => {
             dispatch(fetchSoldiers({superior_id: globalSuperiorId, sortField: globalSortField, order: globalOrder}));
         })

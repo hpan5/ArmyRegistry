@@ -8,10 +8,20 @@ const initialState = {
     sortField: undefined,
     searchTerm: undefined,
     editingSoldier: undefined,
-    currentPage: 1,
-    totalPage: 1,
     order: '',
     status: 'idle',
+    pagination: {
+        totalDocs: 0,
+        offset: 0,
+        limit: 10,
+        totalPages: 1,
+        page: 1,
+        pagingCounter: 1,
+        hasPrevPage: false,
+        hasNextPage: false,
+        prevPage: null,
+        nextPage: null
+    },
     error: null
 }
 //create and add a new soldier
@@ -35,7 +45,7 @@ export const fetchSoldiers = createAsyncThunk('soldiers/fetchSoldiers', async (p
         (skip !== undefined ? `&skip=${skip}` : '');
     console.log("apiUrl:" + apiUrl);
     const response = await axios.get(apiUrl);
-    //console.log(response.data);
+    console.log(response.data);
     return {data: response.data, skip: skip};
 });
 
@@ -107,10 +117,22 @@ const soldiersSlice = createSlice({
         },
         [fetchSoldiers.fulfilled]: (state, action) => {
             state.status = 'succeeded'
+            let data = action.payload.data;
+            console.log("data: ", data);
+            let newSoldiers = data.docs;
+            state.pagination.totalDocs = data.totalDocs;
+            state.pagination.offset = data.offset;
+            state.pagination.limit = data.limit;
+            state.pagination.page = data.page;
+            state.pagination.hasPrevPage = data.hasPrevPage;
+            state.pagination.hasNextPage = data.hasNextPage;
+            state.pagination.prevPage = data.prevPage;
+            state.pagination.nextPage = data.nextPage;
+            console.log("newSoldiers, ", newSoldiers);
             if (action.payload.skip === 0) {
-                state.soldiers = [...action.payload.data];
+                state.soldiers = [...newSoldiers];
             } else {
-                state.soldiers = state.soldiers.concat(action.payload.data);
+                state.soldiers = state.soldiers.concat(newSoldiers);
             }
             //state.soldiers.concat(action.payload)
         },

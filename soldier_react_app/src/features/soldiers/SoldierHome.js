@@ -9,7 +9,6 @@ const SoldierHome = () => {
         <div>
             <h5>US Army Personnel Registery</h5>
             <SearchResetAddBar/>
-            <Table />
             <table>
                 <TableHeader/>
                 <TableBody/>

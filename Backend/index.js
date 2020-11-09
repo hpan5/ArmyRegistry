@@ -8,6 +8,7 @@ const cors = require('cors');
 const PORT = 8000
 const app = new express();
 
+app.use("/photos/", express.static('photos'));
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('public'));

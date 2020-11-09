@@ -13,7 +13,8 @@ const schema = Schema({
     superior: { type: Schema.Types.ObjectId, ref: 'Soldier' },
     direct_subordinates:[{ type: Schema.Types.ObjectId, ref: 'Soldier' }],
     ds_num: Number,
-    _id: Schema.Types.ObjectId
+    _id: Schema.Types.ObjectId,
+    imageUrl: String
 })
 
 schema.plugin(mongoosePaginate);

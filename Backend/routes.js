@@ -50,7 +50,7 @@ router.get('/fetchSoldiers', async (req, res) => {
                 ]
             };
             let soldiers = await Soldier.paginate(filterQuery, options, (err, result) => {
-                res.send(result.docs);
+                res.send(result);
             })
         } else {
             console.log("looking for direct subordinates");
@@ -71,7 +71,7 @@ router.get('/fetchSoldiers', async (req, res) => {
                 
             };
             let soldiers = await Soldier.paginate(filterQuery, options, (error, result) => {
-                res.send(result.docs);
+                res.send(result);
             })
         }
     } catch(error) {
@@ -176,7 +176,7 @@ router.post('/addNewSoldier', bodyParser.urlencoded({ extended: false}), async (
         superior: req.body.superior,
         direct_subordinates: [],
         ds_num: 0,
-        imageUrl: req.body.imageUrl
+        imageUrl: req.body.imageUrl ? req.body.imageUrl : "/photos/default_avatar.jpg"
     })
     await newSoilder.save(async (err) => {
         if (err) res.status(404).send(err);
