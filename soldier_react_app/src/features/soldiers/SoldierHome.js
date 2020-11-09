@@ -9,10 +9,12 @@ const SoldierHome = () => {
         <div>
             <h3>US Army Personnel Registery</h3>
             <SearchResetAddBar/>
+            <Table />
             <table>
                 <TableHeader/>
                 <TableBody/>
             </table>
+            
         </div>
     )
 }
