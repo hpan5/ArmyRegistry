@@ -2,8 +2,8 @@ import React from 'react';
 //import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 //import { addSoldier, fetchSoldiers } from './SoldiersSlice';
-import Form from './Form';
-const EditSolder = () => {
+import Form from './SoldierForm';
+const EditSolder = (props) => {
     //const dispatch = useDispatch();
     const history = useHistory();
     const handleSubmit = (soldier) => {

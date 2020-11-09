@@ -7,7 +7,7 @@ import '../../styles/Table.css';
 const SoldierHome = () => {
     return (
         <div>
-            <h3>US Army Personnel Registery</h3>
+            <h5>US Army Personnel Registery</h5>
             <SearchResetAddBar/>
             <Table />
             <table>

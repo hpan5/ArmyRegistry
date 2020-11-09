@@ -1,0 +1,15 @@
+.left-container{
+    float: left;
+    width: 50%;
+}
+
+
+.right-container{
+    float: right;
+    width: 50%;
+}
+
+button{
+    float: right;
+    margin: 2px;
+}
