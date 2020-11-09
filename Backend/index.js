@@ -3,9 +3,12 @@ const bodyParser = require('body-parser');
 const routes = require('./routes')
 const uri = require('./personal');
 const mongoose = require("mongoose")
+const cors = require('cors');
+
 const PORT = 8000
 const app = new express();
 
+app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('public'));
 app.use((req, res, next) => {

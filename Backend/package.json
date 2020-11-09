@@ -9,6 +9,7 @@
   "author": "Huijie Pan",
   "license": "ISC",
   "dependencies": {
+    "cloudinary": "^1.23.0",
     "collections": "^5.1.12",
     "cors": "^2.8.5",
     "express": "^4.17.1",

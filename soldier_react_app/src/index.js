@@ -10,11 +10,9 @@ import { fetchSoldiers } from './features/soldiers/SoldiersSlice';
 store.dispatch(fetchSoldiers({}));
 
 ReactDOM.render(
-  <React.StrictMode>
     <Provider store={store}>
       <App />
-    </Provider>
-  </React.StrictMode>,
+    </Provider>,
   document.getElementById('root')
 );
 
