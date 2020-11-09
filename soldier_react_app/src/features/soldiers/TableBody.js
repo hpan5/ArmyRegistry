@@ -62,12 +62,12 @@ const TableBody = () => {
                             <td> {soldier.sex} </td>
                             <td> {soldier.rank} </td>
                             <td> {soldier.startDate} </td>
-                            <td> {soldier.phone} </td>
-                            <td> {soldier.email} </td>
-                            <td className="under" onClick={() => dispatch(fetchSoldierById(soldier.superior._id))}> 
+                            <td> <a href={`tel:${soldier.phone}`}> {soldier.phone}</a></td>
+                            <td> <a href={`mailto:${soldier.email}`}> {soldier.email} </a> </td>
+                            <td className="under" style={!soldier.superior ? {pointerEvents: "none", opacity: "0.4"} : {}} onClick={() => dispatch(fetchSoldierById(soldier.superior._id))} > 
                                 {soldier.superior && soldier.superior.name} 
                             </td>
-                            <td className="under" onClick={() => handleDSNumClick({id: soldier.id})}> 
+                            <td className="under" style={soldier.ds_num === 0 ? {pointerEvents: "none", opacity: "0.4"} : {}} onClick={() => handleDSNumClick({id: soldier.id})}> 
                                 {soldier.ds_num !== 0 && soldier.ds_num} 
                             </td>
                             <td onClick={() => handleEditSolderClick(soldier)}> Edit </td>
