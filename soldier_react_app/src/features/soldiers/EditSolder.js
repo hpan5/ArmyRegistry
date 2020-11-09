@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import { editSoldier, fetchSoldiers } from './SoldiersSlice';
 import ImagePicker from './ImagePicker'
 import Form from './SoldierForm';
 const EditSolder = (props) => {
@@ -9,13 +10,17 @@ const EditSolder = (props) => {
     const [image, setImage] = useState();
     const handleSubmit = (soldier) => {
         console.log("submitting", soldier);
-        /*
-        dispatch(addSoldier(soldier)).then(() => {
+        console.log("submitting image: ", image);
+        let imageUrl = {imageUrl : image ? `/photos/${image.name}` : "/photos/default_avatar.jpg"};
+        soldier = {...soldier, ...imageUrl};
+        console.log("about to edit soldier", soldier);
+        
+        dispatch(editSoldier(soldier)).then(() => {
             dispatch(fetchSoldiers({})).then(() => {
                 history.goBack();
             })
         })
-        */
+        
     }
     const handleCancel = () => {
         console.log("cancelling");

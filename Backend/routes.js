@@ -8,7 +8,7 @@ const { json } = require('express');
 var aggregatePaginate = require('mongoose-aggregate-paginate-v2');
 var Deque = require("collections/deque");
 const router = express.Router();
-const LIMIT_PER_DOC = 20;
+const LIMIT_PER_DOC = 10;
 //GET 
 /*const getDirectSubroutines = (superior_id, sortField, order, skip) => {
     if (sortField == '')
@@ -34,7 +34,7 @@ router.get('/fetchSoldiers', async (req, res) => {
             sort: {[sortField] : order},
             populate: 'superior',
             offset: skip,
-            limit: 10
+            limit: LIMIT_PER_DOC
         }
         if (isUndefined(superior_id)) {
             let filterQuery = isUndefined(req.query.filter) ? {} : 
@@ -197,6 +197,7 @@ router.post('/addNewSoldier', bodyParser.urlencoded({ extended: false}), async (
 router.put('/editSoldier/:id', async (req, res) => {
     try {
         const soldier = await Soldier.findById(req.params.id);
+        console.log("solder's name: " + soldier.name);
         //edit information except for direct subroutine
         soldier.name = req.body.name;
         soldier.rank = req.body.rank;
@@ -216,22 +217,20 @@ router.put('/editSoldier/:id', async (req, res) => {
         //  2. add self to new superior's subroutine
         let cur_superior_id = req.body.superior;
         console.log("soldier.superior: " + JSON.stringify(soldier.superior) + "cur_superior_id: " + JSON.stringify(cur_superior_id));
-        if (soldier.superior.toString() !== cur_superior_id.toString()) {
-            if (isUndefined(soldier.superior) && !isUndefined(cur_superior_id)) {
-                //console.log("from undefined to defined");
-                addDirectSubroutine(cur_superior_id, soldier._id);
-            } else if (!isUndefined(soldier.superior) && isUndefined(cur_superior_id)) {
-                //console.log("from defined to undefined");
-                deleteDirectSubroutine(soldier.superior, soldier._id);
-            } else {
-                //console.log("from defined to defined");
+        if (isUndefined(soldier.superior) && isDefined(cur_superior_id)) {
+            console.log("from undefined to defined");
+            addDirectSubroutine(cur_superior_id, soldier._id);
+        } else if (isDefined(soldier.superior) && isUndefined(cur_superior_id)) {
+            console.log("from defined to undefined");
+            deleteDirectSubroutine(soldier.superior, soldier._id);
+        } else if (isDefined(soldier.superior) && isDefined(cur_superior_id)){
+            console.log("from defined to defined");
+            if (cur_superior_id.toString() !== soldier.superior.toString()) {
                 addDirectSubroutine(cur_superior_id, soldier._id);
                 deleteDirectSubroutine(soldier.superior, soldier._id);
             }
-            soldier.superior = cur_superior_id;
-        } else {
-            console.log("superior id is the same");
         }
+        soldier.superior = cur_superior_id;
         await soldier.save();
         res.send(soldier);
     } catch (err) {

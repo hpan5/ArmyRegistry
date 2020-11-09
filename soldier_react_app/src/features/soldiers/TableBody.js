@@ -57,7 +57,7 @@ const TableBody = () => {
             soldiers.map((soldier, i) => {
                 return (
                         <tr key={soldier.id}>
-                            <td> Avatar </td>
+                            <td className="avatar"> <img src={soldier.imageUrl} width="40" height="40"/> </td>
                             <td> {soldier.name} </td>
                             <td> {soldier.sex} </td>
                             <td> {soldier.rank} </td>

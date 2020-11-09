@@ -33,6 +33,16 @@ export const addSoldier = createAsyncThunk('soldiers/addSoldier', async (soldier
     return soldier;
 });
 
+//create and edit a soldier
+export const editSoldier = createAsyncThunk('soldiers/editSoldier', async (soldier) => {
+    console.log("editing")
+    const apiUrl =  `${url}editSoldier/${soldier.id}`;
+    console.log("apiUrl:" + apiUrl);
+    const response = await axios.put(apiUrl, soldier);
+    console.log(response.data);
+    return soldier;
+});
+
 //fetch the soldier based on sortfield, sortOrder and need to skip number
 export const fetchSoldiers = createAsyncThunk('soldiers/fetchSoldiers', async (props) => {
     //console.log(props);
@@ -45,7 +55,7 @@ export const fetchSoldiers = createAsyncThunk('soldiers/fetchSoldiers', async (p
         (skip !== undefined ? `&skip=${skip}` : '');
     console.log("apiUrl:" + apiUrl);
     const response = await axios.get(apiUrl);
-    console.log(response.data);
+    //console.log(response.data);
     return {data: response.data, skip: skip};
 });
 
@@ -167,6 +177,15 @@ const soldiersSlice = createSlice({
         [addSoldier.rejected]: (state, action) => {
             state.status = 'failed'
             state.soldiers.push(action.payload)
+        },
+        //editSoldier
+        [editSoldier.fulfilled]: (state, action) => {
+            state.status = 'succeeded'
+            state.editingSoldier = undefined
+        },
+        [editSoldier.rejected]: (state, action) => {
+            state.status = 'failed'
+            state.editingSoldier = undefined
         },
         //deleteSoldierById
         /*

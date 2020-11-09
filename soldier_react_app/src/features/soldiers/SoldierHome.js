@@ -3,19 +3,21 @@ import SearchResetAddBar from './SearchResetAddBar';
 import TableHeader from './TableHeader';
 import TableBody from './TableBody';
 import '../../styles/Table.css';
-
+import Table from './Table'
 const SoldierHome = () => {
     return (
         <div>
             <h5>US Army Personnel Registery</h5>
             <SearchResetAddBar/>
-            <table>
-                <TableHeader/>
-                <TableBody/>
-            </table>
-            
+            <Table/>
         </div>
     )
 }
 
 export default SoldierHome;
+/*
+<table>
+                <TableHeader/>
+                <TableBody/>
+            </table>
+*/

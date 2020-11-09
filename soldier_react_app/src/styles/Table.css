@@ -19,3 +19,8 @@ table thead th {
 .under {
     text-decoration: underline;
 }
+
+.avatar {
+    width: 1%;
+    white-space: nowrap;
+  }
