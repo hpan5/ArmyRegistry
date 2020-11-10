@@ -10,7 +10,6 @@ const EditSolder = (props) => {
     const globalOrder = useSelector((state) => state.soldiers.order);
     const globalSortField = useSelector((state) => state.soldiers.sortField);
     const globalSuperiorId = useSelector((state) => state.soldiers.superior_id);
-    const globalSkip = useSelector((state) => state.soldiers.pagination.offset);
     const globalLimit = useSelector((state) => state.soldiers.limit);
     const searchTerm = useSelector((state) => state.soldiers.searchTerm);
     const [image, setImage] = useState();

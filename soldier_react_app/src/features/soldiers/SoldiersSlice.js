@@ -23,12 +23,13 @@ const initialState = {
         nextPage: null
     },
     editingSoldier: undefined,
+    previousScrollPosition : 0,
     error: null
 }
 //create and add a new soldier
 export const addSoldier = createAsyncThunk('soldiers/addSoldier', async (soldier) => {
     const apiUrl =  `${url}addNewSoldier/`;
-    console.log("apiUrl:" + apiUrl);
+    //console.log("apiUrl:" + apiUrl);
     const response = await axios.post(apiUrl, soldier);
     console.log(response.data);
     return soldier;
@@ -36,9 +37,9 @@ export const addSoldier = createAsyncThunk('soldiers/addSoldier', async (soldier
 
 //create and edit a soldier
 export const editSoldier = createAsyncThunk('soldiers/editSoldier', async (soldier) => {
-    console.log("editing")
+    //console.log("editing")
     const apiUrl =  `${url}editSoldier/${soldier.id}`;
-    console.log("apiUrl:" + apiUrl);
+    //console.log("apiUrl:" + apiUrl);
     const response = await axios.put(apiUrl, soldier);
     console.log(response.data);
     return soldier;
@@ -64,14 +65,14 @@ export const fetchSoldiers = createAsyncThunk('soldiers/fetchSoldiers', async (p
 
 //fetch the soldier based on sortfield, sortOrder and need to skip number
 export const fetchSuperiorCandidates = createAsyncThunk('soldiers/fetchSuperiorCandidates', async (props) => {
-    console.log(props);
+    //console.log(props);
     const {id = undefined} = props;
     //console.log("sortField: " + sortField.toString() + ", sortOrder: " + order.toString() + ", skip:" + skip);
     const apiUrl =  `${url}fetchSuperiorCandidates?` + 
         (id !== undefined ? `id=${id}` : '');
-    console.log("fetch superior candidates apiUrl:" + apiUrl);
+    //console.log("fetch superior candidates apiUrl:" + apiUrl);
     const response = await axios.get(apiUrl);
-    console.log("superior candidates:", response.data);
+    //console.log("superior candidates:", response.data);
     return response.data;
 });
 
@@ -87,7 +88,7 @@ export const fetchSoldierById = createAsyncThunk('soldiers/fetchSoldierById', as
     const apiUrl =  `${url}fetchSoldier/${id}`;
     console.log("apiUrl:" + apiUrl);
     const response = await axios.get(apiUrl);
-    console.log(response.data);
+    //console.log(response.data);
     return response.data;
 });
 
@@ -97,14 +98,14 @@ const soldiersSlice = createSlice({
     reducers: {
         changeSoldierOrder(state, action) {
             const { sortField } = action.payload;
-            console.log('state.sortField: ' + state.sortField + ', sortField: ' + sortField);
+            //console.log('state.sortField: ' + state.sortField + ', sortField: ' + sortField);
             if (state.sortField === sortField) {
                 state.order = state.order === 'asc' ? 'desc' : 'asc';
             } else {
                 state.sortField = sortField;
                 state.order = 'asc';
             }
-            console.log('state.sortField: ' + state.sortField + ', state.order: ' + state.order);
+            //console.log('state.sortField: ' + state.sortField + ', state.order: ' + state.order);
             
         },
         reset(state, action) {
@@ -112,7 +113,8 @@ const soldiersSlice = createSlice({
             state.order = '';
             state.superior_id = undefined;
             state.searchTerm = "";
-            state.limit = 10;
+            //state.limit = 10;
+            state.previousScrollPosition = 0;
         },
         setNewSuperiorId(state, action) {
             reset();
@@ -136,7 +138,14 @@ const soldiersSlice = createSlice({
         setSearchTerm(state, action) {
             const { searchTerm } = action.payload;
             state.searchTerm = searchTerm;
-            console.log("search Term: " + searchTerm);
+            //console.log("search Term: " + searchTerm);
+        },
+        setPreviousScrollPosition(state, action) {
+            //console.log("hello?")
+            const { previousScrollPosition } = action.payload;
+            //console.log("state.previousScrollPosition: " + action.payload.previousScrollPosition);
+            state.previousScrollPosition = previousScrollPosition;
+            //console.log("state.previousScrollPosition: " + state.previousScrollPosition);
         }
     },
     extraReducers: {
@@ -147,7 +156,7 @@ const soldiersSlice = createSlice({
         [fetchSoldiers.fulfilled]: (state, action) => {
             state.status = 'succeeded'
             let data = action.payload.data;
-            console.log("data: ", data);
+            //console.log("data: ", data);
             let newSoldiers = data.docs;
             state.pagination.totalDocs = data.totalDocs;
             state.pagination.offset = data.offset;
@@ -157,13 +166,17 @@ const soldiersSlice = createSlice({
             state.pagination.hasNextPage = data.hasNextPage;
             state.pagination.prevPage = data.prevPage;
             state.pagination.nextPage = data.nextPage;
-            console.log("newSoldiers, ", newSoldiers);
+            //console.log("newSoldiers, ", newSoldiers);
             if (action.payload.skip === 0) {
                 state.soldiers = [...newSoldiers];
             } else {
                 state.soldiers = state.soldiers.concat(newSoldiers);
             }
-            state.limit = state.soldiers.length;
+            if (state.searchTerm === '') {
+                state.limit = state.soldiers.length;
+                console.log("state.searchTerm: " + state.searchTerm);
+                console.log("state.limit: " + state.limit);
+            }
             //state.soldiers.concat(action.payload)
         },
         [fetchSoldiers.rejected]: (state, action) => {
@@ -220,7 +233,7 @@ const soldiersSlice = createSlice({
     }
 })
 
-export const { changeSoldierOrder, reset, setNewSuperiorId, addEditingUser, setSearchTerm } = soldiersSlice.actions;
+export const { changeSoldierOrder, reset, setNewSuperiorId, addEditingUser, setSearchTerm, setPreviousScrollPosition } = soldiersSlice.actions;
 
 export default soldiersSlice.reducer;
 

@@ -11,6 +11,7 @@ const SearchResetAddBar = () => {
     const globalOrder = useSelector((state) => state.soldiers.order);
     const globalSortField = useSelector((state) => state.soldiers.sortField);
     const globalSuperiorId = useSelector((state) => state.soldiers.superior_id);
+    const globalLimit = useSelector((state) => state.soldiers.limit);
     const searchTerm = useSelector((state) => state.soldiers.searchTerm);
     const resetSoldierOrder = () => {
         dispatch(reset());
@@ -27,11 +28,13 @@ const SearchResetAddBar = () => {
         event.preventDefault();
         dispatch(setSearchTerm({searchTerm: event.target.value}));
         console.log("search value: " + event.target.value)
-        dispatch(fetchSoldiers({filter: event.target.value, superior_id: globalSuperiorId, sortField: globalSortField, order: globalOrder}));
+        dispatch(fetchSoldiers({filter: event.target.value, superior_id: globalSuperiorId, sortField: globalSortField, order: globalOrder, limit: globalLimit}));
     }
     return (
         <div>
-            <p>total soldiers NO: {soldiers.length}</p>
+            <div>
+                <small>soldiers NO. : {soldiers.length}</small>
+            </div> 
             <div className="bar">
                 <form className="barForm">
                     <label> Search </label>

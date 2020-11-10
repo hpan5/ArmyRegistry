@@ -4,7 +4,7 @@ import Table from './Table'
 const SoldierHome = () => {
     return (
         <div>
-            <h5>US Army Personnel Registery</h5>
+            <h3>US Army Personnel Registery</h3>
             <SearchResetAddBar/>
             <Table/>
         </div>
