@@ -4,7 +4,7 @@ import { selectAllSoldiers, fetchSoldiers } from './SoldiersSlice'
 import InfiniteScroll from 'react-infinite-scroll-component';
 import TableHeader from './TableHeader';
 import TableBody from './TableBody';
-
+import '../../styles/Table.css';
 const Table = () => {
   const dispatch = useDispatch();
   const soldiers = useSelector(selectAllSoldiers);
@@ -20,7 +20,7 @@ const Table = () => {
   const fetchMoreSoldiers = () => {
     setTimeout(() => {
       dispatch(fetchSoldiers({skip: soldiers.length, superior_id: globalSuperiorId, sortField: globalSortField, order: globalOrder}))
-    }, 1500);
+    }, 500);
   }
     // Render the UI for your table
   return (
@@ -31,12 +31,13 @@ const Table = () => {
       loader={<h4>Loading next page...</h4>}
       scrollableTarget="table-row"
       inverse={true}
+      scrollThreshold={1.0}
     >
       <table>
         <TableHeader/>
         <TableBody/>
       </table>
-      <h4>{hasMore ? "" : "You've reached my limit :("}</h4>
+      <p>{hasMore ? "" : "You've reached my limit :("}</p>
     </InfiniteScroll>
   );
 }

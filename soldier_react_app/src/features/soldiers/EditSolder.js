@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { editSoldier, fetchSoldiers } from './SoldiersSlice';
 import ImagePicker from './ImagePicker'
@@ -7,6 +7,12 @@ import Form from './SoldierForm';
 const EditSolder = (props) => {
     const dispatch = useDispatch();
     const history = useHistory();
+    const globalOrder = useSelector((state) => state.soldiers.order);
+    const globalSortField = useSelector((state) => state.soldiers.sortField);
+    const globalSuperiorId = useSelector((state) => state.soldiers.superior_id);
+    const globalSkip = useSelector((state) => state.soldiers.pagination.offset);
+    const globalLimit = useSelector((state) => state.soldiers.limit);
+    const searchTerm = useSelector((state) => state.soldiers.searchTerm);
     const [image, setImage] = useState();
     const handleSubmit = (soldier) => {
         console.log("submitting", soldier);
@@ -16,7 +22,7 @@ const EditSolder = (props) => {
         console.log("about to edit soldier", soldier);
         
         dispatch(editSoldier(soldier)).then(() => {
-            dispatch(fetchSoldiers({})).then(() => {
+            dispatch(fetchSoldiers({superior_id: globalSuperiorId, sortField: globalSortField, order: globalOrder, limit: globalLimit, filter: searchTerm})).then(() => {
                 history.goBack();
             })
         })

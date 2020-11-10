@@ -16,7 +16,7 @@ const LIMIT_PER_DOC = 10;
 
 //fetch all soldiers with three states of order: default, ascending, descending
 router.get('/fetchSoldiers', async (req, res) => {
-    
+    let limit = isDefined(req.query.limit) ? Number(req.query.limit) : 10;
     let superior_id = isDefined(req.query.superior_id) && String(req.query.superior_id);
     let sortField = isDefined(req.query.sortField) && String(req.query.sortField);
     let order = isDefined(req.query.order) ? String(req.query.order) : '';
@@ -34,7 +34,7 @@ router.get('/fetchSoldiers', async (req, res) => {
             sort: {[sortField] : order},
             populate: 'superior',
             offset: skip,
-            limit: LIMIT_PER_DOC
+            limit: limit
         }
         if (isUndefined(superior_id)) {
             let filterQuery = isUndefined(req.query.filter) ? {} : 

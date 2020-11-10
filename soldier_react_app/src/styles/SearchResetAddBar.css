@@ -2,11 +2,12 @@
     display: inline;
 }
 
-.barForm {
+ .barForm {
     display: inline-block;
+    vertical-align:top;
 }
 
 .bar_button {
     display: inline-block;
-    float: right;
-}
+    vertical-align:top;
+} 

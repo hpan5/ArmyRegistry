@@ -11,12 +11,14 @@ const TableBody = () => {
     const globalSortField = useSelector((state) => state.soldiers.sortField);
     const globalSuperiorId = useSelector((state) => state.soldiers.superior_id);
     const globalSkip = useSelector((state) => state.soldiers.pagination.offset);
+    const globalLimit = useSelector((state) => state.soldiers.limit);
+    const searchTerm = useSelector((state) => state.soldiers.searchTerm);
     const history = useHistory();
     useEffect(() => {
         if (globalStatus === 'idle' && globalSkip === 0) {
-            dispatch(fetchSoldiers({superior_id: globalSuperiorId, sortField: globalSortField, order: globalOrder}));
+            dispatch(fetchSoldiers({superior_id: globalSuperiorId, sortField: globalSortField, order: globalOrder, limit: globalLimit, filter: searchTerm}));
         }
-    },[dispatch, globalStatus, globalSuperiorId, globalSortField, globalOrder, globalSkip]);
+    },[dispatch, globalStatus, globalSuperiorId, globalSortField, globalOrder, globalSkip, globalLimit, searchTerm]);
 
     const handleEditSolderClick = (editingSoldier) => {
         

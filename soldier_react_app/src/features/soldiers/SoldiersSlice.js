@@ -4,10 +4,10 @@ const url = "http://localhost:8000/soldiers/";
 const initialState = {
     soldiers: [],
     superiorCandidates: [],
+    limit: 10,
     superior_id: undefined,
     sortField: undefined,
     searchTerm: '',
-    editingSoldier: undefined,
     order: '',
     status: 'idle',
     pagination: {
@@ -22,6 +22,7 @@ const initialState = {
         prevPage: null,
         nextPage: null
     },
+    editingSoldier: undefined,
     error: null
 }
 //create and add a new soldier
@@ -46,14 +47,15 @@ export const editSoldier = createAsyncThunk('soldiers/editSoldier', async (soldi
 //fetch the soldier based on sortfield, sortOrder and need to skip number
 export const fetchSoldiers = createAsyncThunk('soldiers/fetchSoldiers', async (props) => {
     //console.log(props);
-    const {superior_id = undefined, sortField = undefined, order = "", skip = 0, filter=''} = props;
+    const {superior_id = undefined, sortField = undefined, order = "", skip = 0, filter='', limit=10} = props;
     //console.log("sortField: " + sortField.toString() + ", sortOrder: " + order.toString() + ", skip:" + skip);
     const apiUrl =  `${url}fetchSoldiers?` + 
         (superior_id !== undefined ? `superior_id=${superior_id}` : '') + 
         (sortField !== undefined ? `&sortField=${sortField}` : '') + 
         (order !== undefined ? `&order=${order}` : '') + 
         (skip !== undefined ? `&skip=${skip}` : '') + 
-        (filter !== undefined ? `&filter=${filter}` : '');
+        (filter !== undefined ? `&filter=${filter}` : '')+ 
+        (limit !== undefined ? `&limit=${limit}` : '');
     console.log("apiUrl:" + apiUrl);
     const response = await axios.get(apiUrl);
     //console.log(response.data);
@@ -110,6 +112,7 @@ const soldiersSlice = createSlice({
             state.order = '';
             state.superior_id = undefined;
             state.searchTerm = "";
+            state.limit = 10;
         },
         setNewSuperiorId(state, action) {
             reset();
@@ -118,12 +121,22 @@ const soldiersSlice = createSlice({
         },
         addEditingUser(state, action) {
             const { editingSoldier } = action.payload;
-            state.editingSoldier = editingSoldier;
+            state.editingSoldier = {
+                name : editingSoldier.name,
+                rank : editingSoldier.rank,
+                sex : editingSoldier.sex,
+                startDate : editingSoldier.startDate,
+                phone : editingSoldier.phone,
+                email : editingSoldier.email,
+                superior : editingSoldier.superior && editingSoldier.superior._id,
+                imageUrl : editingSoldier.imageUrl
+            };
             //state.editingSoldier.superior = editingSoldier.superior && editingSoldier.superior._id;
         },
         setSearchTerm(state, action) {
             const { searchTerm } = action.payload;
             state.searchTerm = searchTerm;
+            console.log("search Term: " + searchTerm);
         }
     },
     extraReducers: {
@@ -150,6 +163,7 @@ const soldiersSlice = createSlice({
             } else {
                 state.soldiers = state.soldiers.concat(newSoldiers);
             }
+            state.limit = state.soldiers.length;
             //state.soldiers.concat(action.payload)
         },
         [fetchSoldiers.rejected]: (state, action) => {
@@ -179,6 +193,7 @@ const soldiersSlice = createSlice({
         [addSoldier.fulfilled]: (state, action) => {
             state.status = 'succeeded'
             state.soldiers = [...state.soldiers, action.payload]
+            state.limit += 1
         },
         [addSoldier.rejected]: (state, action) => {
             state.status = 'failed'
@@ -194,14 +209,10 @@ const soldiersSlice = createSlice({
             state.editingSoldier = undefined
         },
         //deleteSoldierById
-        /*
+        
         [deleteSoldierById.fulfilled]: (state, action) => {
             state.status = 'succeeded';
-            console.log("delete id: ", action.payload);
-            let listAfterDeleted = state.soldiers.filter((soldier) => soldier.id !== action.payload);
-            console.log(listAfterDeleted);
-            state.soldiers = listAfterDeleted;
-        },*/
+        },
         [deleteSoldierById.rejected]: (state, action) => {
             state.status = 'failed'
             //state.soldiers.push(action.payload)
