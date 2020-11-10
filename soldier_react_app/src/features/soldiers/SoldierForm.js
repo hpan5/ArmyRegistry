@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'react-redux';
-import { Field, reduxForm, setSubmitFailed } from 'redux-form'
+import { Field, reduxForm } from 'redux-form'
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchSuperiorCandidates } from './SoldiersSlice';
 import '../../styles/Form.css'
@@ -8,7 +8,7 @@ let SoldierForm = (props) => {
   const { handleSubmit, valid, onCancel} = props
   const dispatch = useDispatch();
   const superiorCandidates = useSelector((state) => state.soldiers.superiorCandidates);
-  const editingSoldier = useSelector((state) => state.soldiers.editingSoldier);
+  //const editingSoldier = useSelector((state) => state.soldiers.editingSoldier);
   
   useEffect(() => {
     if (superiorCandidates === undefined || superiorCandidates.length === 0) {

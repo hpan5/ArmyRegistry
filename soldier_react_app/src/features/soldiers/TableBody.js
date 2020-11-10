@@ -10,12 +10,13 @@ const TableBody = () => {
     const globalOrder = useSelector((state) => state.soldiers.order);
     const globalSortField = useSelector((state) => state.soldiers.sortField);
     const globalSuperiorId = useSelector((state) => state.soldiers.superior_id);
+    const globalSkip = useSelector((state) => state.soldiers.pagination.offset);
     const history = useHistory();
     useEffect(() => {
-        if (globalStatus === 'idle') {
+        if (globalStatus === 'idle' && globalSkip === 0) {
             dispatch(fetchSoldiers({superior_id: globalSuperiorId, sortField: globalSortField, order: globalOrder}));
         }
-    },[dispatch, globalStatus, globalSuperiorId, globalSortField, globalOrder]);
+    },[dispatch, globalStatus, globalSuperiorId, globalSortField, globalOrder, globalSkip]);
 
     const handleEditSolderClick = (editingSoldier) => {
         
@@ -39,13 +40,7 @@ const TableBody = () => {
         dispatch(fetchSoldiers({superior_id: id}));
     }
     let content;
-    if (globalStatus === 'loading') {
-        content = (
-            <tr>
-                <td> Loading </td>
-            </tr>
-        );
-    } else if (globalStatus === 'failed') {
+    if (globalStatus === 'failed') {
         content = (
             <tr>
                 <td> error fetching table </td>
@@ -56,8 +51,8 @@ const TableBody = () => {
         content = (
             soldiers.map((soldier, i) => {
                 return (
-                        <tr key={soldier.id}>
-                            <td className="avatar"> <img src={soldier.imageUrl} width="40" height="40"/> </td>
+                        <tr key={soldier.id} className="table-row">
+                            <td className="avatar"> <img src={soldier.imageUrl} width="40" height="40" alt=""/> </td>
                             <td> {soldier.name} </td>
                             <td> {soldier.sex} </td>
                             <td> {soldier.rank} </td>
@@ -78,7 +73,7 @@ const TableBody = () => {
         );
     }
     return (
-        <tbody>
+        <tbody className="table-body">
             {content}
         </tbody>
     );
@@ -119,4 +114,12 @@ content = (
             </InfiniteScroll>  
             
         );
+        /*
+        if (globalStatus === 'loading') {
+        content = (
+            <tr>
+                <td> Loading </td>
+            </tr>
+        );
+    } else 
 */

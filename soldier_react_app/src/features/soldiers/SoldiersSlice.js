@@ -6,7 +6,7 @@ const initialState = {
     superiorCandidates: [],
     superior_id: undefined,
     sortField: undefined,
-    searchTerm: undefined,
+    searchTerm: '',
     editingSoldier: undefined,
     order: '',
     status: 'idle',
@@ -46,13 +46,14 @@ export const editSoldier = createAsyncThunk('soldiers/editSoldier', async (soldi
 //fetch the soldier based on sortfield, sortOrder and need to skip number
 export const fetchSoldiers = createAsyncThunk('soldiers/fetchSoldiers', async (props) => {
     //console.log(props);
-    const {superior_id = undefined, sortField = undefined, order = "", skip = 0} = props;
+    const {superior_id = undefined, sortField = undefined, order = "", skip = 0, filter=''} = props;
     //console.log("sortField: " + sortField.toString() + ", sortOrder: " + order.toString() + ", skip:" + skip);
     const apiUrl =  `${url}fetchSoldiers?` + 
         (superior_id !== undefined ? `superior_id=${superior_id}` : '') + 
         (sortField !== undefined ? `&sortField=${sortField}` : '') + 
         (order !== undefined ? `&order=${order}` : '') + 
-        (skip !== undefined ? `&skip=${skip}` : '');
+        (skip !== undefined ? `&skip=${skip}` : '') + 
+        (filter !== undefined ? `&filter=${filter}` : '');
     console.log("apiUrl:" + apiUrl);
     const response = await axios.get(apiUrl);
     //console.log(response.data);
@@ -118,6 +119,11 @@ const soldiersSlice = createSlice({
         addEditingUser(state, action) {
             const { editingSoldier } = action.payload;
             state.editingSoldier = editingSoldier;
+            //state.editingSoldier.superior = editingSoldier.superior && editingSoldier.superior._id;
+        },
+        setSearchTerm(state, action) {
+            const { searchTerm } = action.payload;
+            state.searchTerm = searchTerm;
         }
     },
     extraReducers: {
@@ -148,7 +154,7 @@ const soldiersSlice = createSlice({
         },
         [fetchSoldiers.rejected]: (state, action) => {
             state.status = 'failed'
-            state.soldiers.push(action.payload.data)
+            state.soldiers.push(action.payload)
         },
         //fetchSoldierById
         [fetchSoldierById.fulfilled]: (state, action) => {
@@ -203,7 +209,7 @@ const soldiersSlice = createSlice({
     }
 })
 
-export const { changeSoldierOrder, reset, setNewSuperiorId, addEditingUser } = soldiersSlice.actions;
+export const { changeSoldierOrder, reset, setNewSuperiorId, addEditingUser, setSearchTerm } = soldiersSlice.actions;
 
 export default soldiersSlice.reducer;
 

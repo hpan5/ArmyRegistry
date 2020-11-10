@@ -1,7 +1,5 @@
 import React from 'react';
 import SearchResetAddBar from './SearchResetAddBar';
-import TableHeader from './TableHeader';
-import TableBody from './TableBody';
 import '../../styles/Table.css';
 import Table from './Table'
 const SoldierHome = () => {

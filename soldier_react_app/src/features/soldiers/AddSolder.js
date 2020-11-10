@@ -4,9 +4,6 @@ import { useHistory } from 'react-router-dom';
 import { addSoldier, fetchSoldiers } from './SoldiersSlice';
 import Form from './SoldierForm';
 import ImagePicker from './ImagePicker'
-//gAdhZY-_TUWPjVUIkY7ju9ZIPss
-const url = '/';
-const preset = 'msatr3hj';
 
 const AddSolder = (props) => {
     const dispatch = useDispatch();
