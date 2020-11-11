@@ -4,7 +4,7 @@ import '../../styles/SearchResetAddBar.css';
 import { reset, fetchSoldiers, fetchSuperiorCandidates, setSearchTerm, selectAllSoldiers } from './SoldiersSlice';
 import { useHistory } from 'react-router-dom';
 
-const SearchResetAddBar = () => {
+const SearchResetAddBar = (props) => {
     const history = useHistory();
     const dispatch = useDispatch();
     const soldiers = useSelector(selectAllSoldiers);
@@ -13,7 +13,10 @@ const SearchResetAddBar = () => {
     const globalSuperiorId = useSelector((state) => state.soldiers.superior_id);
     const globalLimit = useSelector((state) => state.soldiers.limit);
     const searchTerm = useSelector((state) => state.soldiers.searchTerm);
+
     const resetSoldierOrder = () => {
+        console.log("props.scrollArea" , props.scrollArea);
+        props.scrollArea.current.scrollTo(0, 0);
         dispatch(reset());
         dispatch(fetchSoldiers({}));
     }

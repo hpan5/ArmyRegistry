@@ -256,6 +256,7 @@ router.delete("/deleteSoldier/:id", async (req, res) => {
         } else {
             console.log("superior is defined")
             let superior_id = soldier_toBeDeleted.superior;
+            console.log("superior's id of soldier to be deleted: " + soldier_toBeDeleted.superior);
             for (let ds_id of soldier_toBeDeleted.direct_subordinates) {
                 let id = ds_id.toString();
                 console.log("ds_id deleting: ", id);
@@ -338,6 +339,7 @@ const addDirectSubroutine = async (superior_id, soldier_id) => {
         const superior = await Soldier.findById(superior_id);
         superior.direct_subordinates.push(soldier_id);
         superior.ds_num = superior.direct_subordinates.length;
+        console.log(superior.direct_subordinates);
         await superior.save();
     } catch(error) {
         console.log("add direct subroutine failed")

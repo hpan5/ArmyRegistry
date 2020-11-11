@@ -15,7 +15,6 @@ const TableBody = (props) => {
     const searchTerm = useSelector((state) => state.soldiers.searchTerm);
     const previousScrollPosition = useSelector((state) => state.soldiers.previousScrollPosition);
     const history = useHistory();
-    const { scrollTop, setGlobalScrollTop } = props;
     useEffect(() => {
         if (globalStatus === 'idle' && globalSkip === 0) {
             dispatch(fetchSoldiers({superior_id: globalSuperiorId, sortField: globalSortField, order: globalOrder, limit: globalLimit, filter: searchTerm}));
@@ -39,7 +38,7 @@ const TableBody = (props) => {
 
     const handleDeleteSoldierClick = (id) => {
         dispatch(deleteSoldierById(id)).then(() => {
-            dispatch(fetchSoldiers({superior_id: globalSuperiorId, sortField: globalSortField, order: globalOrder}));
+            dispatch(fetchSoldiers({superior_id: globalSuperiorId, sortField: globalSortField, order: globalOrder, limit: globalLimit, filter: searchTerm}));
         })
     }
     const handleDSNumClick = (props) => {
@@ -55,11 +54,10 @@ const TableBody = (props) => {
             </tr>
         );
     } else {
-        //console.log("about to render list:", soldiers);
         content = (
             soldiers.map((soldier, i) => {
                 return (
-                        <tr key={i} className="table-row">
+                        <tr key={soldier.id} className="table-row">
                             <td className="avatar"> <img src={soldier.imageUrl} width="40" height="40" alt=""/> </td>
                             <td> {soldier.name} </td>
                             <td> {soldier.sex} </td>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { editSoldier, fetchSoldiers } from './SoldiersSlice';
+import { editSoldier, fetchSoldiers, resetEditingSoldier } from './SoldiersSlice';
 import ImagePicker from './ImagePicker'
 import Form from './SoldierForm';
 const EditSolder = (props) => {
@@ -12,6 +12,7 @@ const EditSolder = (props) => {
     const globalSuperiorId = useSelector((state) => state.soldiers.superior_id);
     const globalLimit = useSelector((state) => state.soldiers.limit);
     const searchTerm = useSelector((state) => state.soldiers.searchTerm);
+    const editingSoldier = useSelector((state) => state.soldiers.editingSoldier);
     const [image, setImage] = useState();
     const handleSubmit = (soldier) => {
         console.log("submitting", soldier);
@@ -19,8 +20,8 @@ const EditSolder = (props) => {
         let imageUrl = {imageUrl : image ? `/photos/${image.name}` : "/photos/default_avatar.jpg"};
         soldier = {...soldier, ...imageUrl};
         console.log("about to edit soldier", soldier);
-        
-        dispatch(editSoldier(soldier)).then(() => {
+        console.log("editing soldier id: " + editingSoldier);
+        dispatch(editSoldier({id: editingSoldier.id, soldier: soldier})).then(() => {
             dispatch(fetchSoldiers({superior_id: globalSuperiorId, sortField: globalSortField, order: globalOrder, limit: globalLimit, filter: searchTerm})).then(() => {
                 history.goBack();
             })
@@ -29,6 +30,7 @@ const EditSolder = (props) => {
     }
     const handleCancel = () => {
         console.log("cancelling");
+        dispatch(resetEditingSoldier({}));
         history.goBack();
     }
     return (

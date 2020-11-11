@@ -17,7 +17,7 @@ const TableHeader = () => {
     
     useEffect(() => {
         dispatch(fetchSoldiers({filter: searchTerm, superior_id: superiorId, sortField : sortField, order: order, limit: globalLimit}));
-    },[dispatch, searchTerm, superiorId, sortField, order]);
+    },[dispatch, searchTerm, superiorId, sortField, order, globalLimit]);
     
     return (
         <thead>
