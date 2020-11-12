@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import '../../styles/SearchResetAddBar.css';
-import { reset, fetchSoldiers, fetchSuperiorCandidates, setSearchTerm, selectAllSoldiers } from './SoldiersSlice';
+import { resetEditingSoldier, reset, fetchSoldiers, fetchSuperiorCandidates, setSearchTerm, selectAllSoldiers, setPreviousScrollPosition  } from './SoldiersSlice';
 import { useHistory } from 'react-router-dom';
 
 const SearchResetAddBar = (props) => {
@@ -15,13 +15,14 @@ const SearchResetAddBar = (props) => {
     const searchTerm = useSelector((state) => state.soldiers.searchTerm);
 
     const resetSoldierOrder = () => {
-        console.log("props.scrollArea" , props.scrollArea);
         props.scrollArea.current.scrollTo(0, 0);
         dispatch(reset());
         dispatch(fetchSoldiers({}));
     }
 
     const handleNewSoldierClick = async () => {
+        dispatch(resetEditingSoldier({}));
+        dispatch(setPreviousScrollPosition({previousScrollPosition: props.scrollArea.current.scrollTop}));
         dispatch(fetchSuperiorCandidates({})).then(
             () => history.push('/AddSolder')
         )
@@ -30,7 +31,7 @@ const SearchResetAddBar = (props) => {
     const handleChange = (event) => {
         event.preventDefault();
         dispatch(setSearchTerm({searchTerm: event.target.value}));
-        console.log("search value: " + event.target.value)
+        console.log("fetching new soldiers [SEARCH TERM CHANGING] : ");
         dispatch(fetchSoldiers({filter: event.target.value, superior_id: globalSuperiorId, sortField: globalSortField, order: globalOrder, limit: globalLimit}));
     }
     return (

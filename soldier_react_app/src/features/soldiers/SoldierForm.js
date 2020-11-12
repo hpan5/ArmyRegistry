@@ -131,10 +131,10 @@ const newField = ({
 
 SoldierForm = reduxForm({
   form: 'soldier',
-  validate: myValidator,
-  enableReinitialize: true
+  validate: myValidator
 })(SoldierForm)
-
+//,
+//enableReinitialize: true
 SoldierForm = connect(
   state => ({
     initialValues: state.soldiers.editingSoldier ? state.soldiers.editingSoldier : {}

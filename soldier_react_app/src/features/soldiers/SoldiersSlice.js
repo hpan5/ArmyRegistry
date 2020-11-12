@@ -5,6 +5,7 @@ const initialState = {
     soldiers: [],
     superiorCandidates: [],
     limit: 5,
+    soldier_id : undefined,
     superior_id: undefined,
     sortField: undefined,
     searchTerm: '',
@@ -48,10 +49,11 @@ export const editSoldier = createAsyncThunk('soldiers/editSoldier', async (props
 
 //fetch the soldier based on sortfield, sortOrder and need to skip number
 export const fetchSoldiers = createAsyncThunk('soldiers/fetchSoldiers', async (props) => {
-    //console.log(props);
-    const {superior_id = undefined, sortField = undefined, order = "", skip = 0, filter='', limit=5} = props;
+    console.log(props);
+    const {soldier_id=undefined, superior_id = undefined, sortField = undefined, order = "", skip = 0, filter='', limit=5} = props;
     //console.log("sortField: " + sortField.toString() + ", sortOrder: " + order.toString() + ", skip:" + skip);
     const apiUrl =  `${url}fetchSoldiers?` + 
+        (soldier_id !== undefined ? `soldier_id=${soldier_id}` : '') + 
         (superior_id !== undefined ? `superior_id=${superior_id}` : '') + 
         (sortField !== undefined ? `&sortField=${sortField}` : '') + 
         (order !== undefined ? `&order=${order}` : '') + 
@@ -106,6 +108,7 @@ const soldiersSlice = createSlice({
                 state.sortField = sortField;
                 state.order = 'asc';
             }
+            //fetchSoldiers({filter: state.searchTerm, superior_id: state.superior_id, sortField : state.sortField, order: state.order, limit: state.limit})
             //console.log('state.sortField: ' + state.sortField + ', state.order: ' + state.order);
             
         },
@@ -145,13 +148,13 @@ const soldiersSlice = createSlice({
         setPreviousScrollPosition(state, action) {
             //console.log("hello?")
             const { previousScrollPosition } = action.payload;
-            //console.log("state.previousScrollPosition: " + action.payload.previousScrollPosition);
+            console.log("state.previousScrollPosition: " + action.payload.previousScrollPosition);
             state.previousScrollPosition = previousScrollPosition;
             //console.log("state.previousScrollPosition: " + state.previousScrollPosition);
         },
         resetEditingSoldier(state, action) {
             state.editingSoldier = undefined;
-            console.log("reset editing soldier")
+            //console.log("reset editing soldier")
         }
     },
     extraReducers: {
@@ -161,6 +164,7 @@ const soldiersSlice = createSlice({
         },
         [fetchSoldiers.fulfilled]: (state, action) => {
             state.status = 'succeeded'
+            console.log("fetch soldiers fulfilled");
             let data = action.payload.data;
             console.log("data: ", data);
             let newSoldiers = data.docs;
@@ -183,57 +187,72 @@ const soldiersSlice = createSlice({
                 //console.log("state.searchTerm: " + state.searchTerm);
                 //console.log("state.limit: " + state.limit);
             }
+
+            
             //state.soldiers.concat(action.payload)
         },
         [fetchSoldiers.rejected]: (state, action) => {
             state.status = 'failed'
+            console.log("fetch soldiers rejected");
             state.soldiers.push(action.payload)
         },
         //fetchSoldierById
         [fetchSoldierById.fulfilled]: (state, action) => {
             state.status = 'succeeded'
+            console.log("fetch soldiers succeeded");
             //console.log("action pay load after fetch soldier", action.payload);
+            action.payload.skip = 0;
+            state.pagination.hasNextPage = false;
             state.soldiers = [action.payload]
         },
         [fetchSoldierById.rejected]: (state, action) => {
             state.status = 'failed'
+            console.log("fetchSoldierById rejected");
             state.soldiers.push(action.payload)
         },
         //fetchSuperiorCandidates
         [fetchSuperiorCandidates.fulfilled]: (state, action) => {
             state.status = 'succeeded'
+            console.log("fetchSoldierById succeeded");
             state.superiorCandidates = [...action.payload]//state.soldiers.concat(action.payload)
         },
         [fetchSuperiorCandidates.rejected]: (state, action) => {
             state.status = 'failed'
+            console.log("fetchSuperiorCandidates rejected");
             state.superiorCandidates.push(action.payload)
         },
         //addSoldier
         [addSoldier.fulfilled]: (state, action) => {
             state.status = 'succeeded'
+            console.log("addSoldier fulfilled");
             state.soldiers = [...state.soldiers, action.payload]
             state.limit += 1
         },
         [addSoldier.rejected]: (state, action) => {
             state.status = 'failed'
+            console.log("addSoldier failed");
             state.soldiers.push(action.payload)
         },
         //editSoldier
         [editSoldier.fulfilled]: (state, action) => {
             state.status = 'succeeded'
-            state.editingSoldier = undefined
+            console.log("editSoldier fulfilled");
+            //state.editingSoldier = undefined
         },
         [editSoldier.rejected]: (state, action) => {
             state.status = 'failed'
-            state.editingSoldier = undefined
+            console.log("editSoldier failed");
+            //state.editingSoldier = undefined
         },
         //deleteSoldierById
         
         [deleteSoldierById.fulfilled]: (state, action) => {
+            console.log("deleteSoldierById fulfilled");
             state.status = 'succeeded';
         },
         [deleteSoldierById.rejected]: (state, action) => {
             state.status = 'failed'
+            console.log("deleteSoldierById failed");
             //state.soldiers.push(action.payload)
         }
     }

@@ -3,13 +3,14 @@
 }
 
 table {
-    width: 100%;
+    width: 900px;
     table-layout: fixed;
 }
 
 table td {
     padding: 5px;
     font-size: 10px;
+    overflow: hidden;
 }
 
 table thead th {

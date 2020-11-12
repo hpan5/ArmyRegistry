@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { changeSoldierOrder, fetchSoldiers } from './SoldiersSlice';
 
-const TableHeader = () => {
+const TableHeader = (props) => {
     const dispatch = useDispatch();
     const order = useSelector((state) => state.soldiers.order);
     const sortField = useSelector((state) => state.soldiers.sortField);
@@ -10,15 +10,26 @@ const TableHeader = () => {
     const searchTerm = useSelector((state) => state.soldiers.searchTerm);
     const globalLimit = useSelector((state) => state.soldiers.limit);
     const changeSortFieldAndOrder = (field) => {
-        dispatch(changeSoldierOrder({sortField : field}));
+        let changedOrder = order;
+        let changedField = sortField;
+        if (sortField === field) {
+            changedOrder = order === 'asc' ? 'desc' : 'asc';
+        } else {
+            changedField = field;
+            changedOrder = 'asc';
+        }
+        console.log("changedField: " + changedField);
+        dispatch(changeSoldierOrder({sortField: field}));
+        dispatch(fetchSoldiers({filter: searchTerm, superior_id: superiorId, sortField : changedField, order: changedOrder, limit: globalLimit}));
         console.log('fieldName: ' + sortField + ', order: ' + order);
         
     }
-    
+    /*
     useEffect(() => {
-        dispatch(fetchSoldiers({filter: searchTerm, superior_id: superiorId, sortField : sortField, order: order, limit: globalLimit}));
-    },[dispatch, searchTerm, superiorId, sortField, order, globalLimit]);
-    
+        console.log("fetching new soldiers [CHANGE SORT FIELD AND ORDER] : ");
+        dispatch(fetchSoldiers({filter: searchTerm, superior_id: superiorId, sortField : sortField, order: order}));
+    },[dispatch, searchTerm, superiorId, sortField, order]);
+    */
     return (
         <thead>
             <tr>

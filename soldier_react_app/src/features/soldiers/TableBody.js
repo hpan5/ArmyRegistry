@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { addEditingUser, fetchSuperiorCandidates, selectAllSoldiers, fetchSoldiers, fetchSoldierById, deleteSoldierById, setNewSuperiorId, setPreviousScrollPosition } from './SoldiersSlice'
+import { addEditingUser, fetchSuperiorCandidates, selectAllSoldiers, fetchSoldiers, deleteSoldierById, setNewSuperiorId, setPreviousScrollPosition } from './SoldiersSlice'
 import { useHistory } from 'react-router-dom';
 
 const TableBody = (props) => {
@@ -13,23 +13,18 @@ const TableBody = (props) => {
     const globalSkip = useSelector((state) => state.soldiers.pagination.offset);
     const globalLimit = useSelector((state) => state.soldiers.limit);
     const searchTerm = useSelector((state) => state.soldiers.searchTerm);
-    const previousScrollPosition = useSelector((state) => state.soldiers.previousScrollPosition);
+    //const previousScrollPosition = useSelector((state) => state.soldiers.previousScrollPosition);
     const history = useHistory();
     useEffect(() => {
         if (globalStatus === 'idle' && globalSkip === 0) {
+            console.log("fetching soldiers [TABLE BODY RELOADING]: ");
             dispatch(fetchSoldiers({superior_id: globalSuperiorId, sortField: globalSortField, order: globalOrder, limit: globalLimit, filter: searchTerm}));
         }
     },[dispatch, globalStatus, globalSuperiorId, globalSortField, globalOrder, globalSkip, globalLimit, searchTerm]);
     
-    if (previousScrollPosition !== 0) {
-        //window.scrollTo(0, previousScrollPosition);
-        console.log("hopefully window scrolled");
-        dispatch(setPreviousScrollPosition({ previousScrollPosition: 0 }));
-    }
 
     const handleEditSolderClick = (editingSoldier) => {
-        //dispatch(setPreviousScrollPosition({ previousScrollPosition: window.pageYOffset }));
-        //setGlobalScrollTop(scrollTop);
+        dispatch(setPreviousScrollPosition({previousScrollPosition: props.scrollArea.current.scrollTop}));
         dispatch(addEditingUser({ editingSoldier }))
         dispatch(fetchSuperiorCandidates({id: editingSoldier.id})).then(
             () => history.push('/EditSolder')
@@ -38,6 +33,7 @@ const TableBody = (props) => {
 
     const handleDeleteSoldierClick = (id) => {
         dispatch(deleteSoldierById(id)).then(() => {
+            console.log("fetching soldiers [DELETE SOLDIER]: ");
             dispatch(fetchSoldiers({superior_id: globalSuperiorId, sortField: globalSortField, order: globalOrder, limit: globalLimit, filter: searchTerm}));
         })
     }
@@ -65,7 +61,7 @@ const TableBody = (props) => {
                             <td> {soldier.startDate} </td>
                             <td> <a href={`tel:${soldier.phone}`}> {soldier.phone}</a></td>
                             <td> <a href={`mailto:${soldier.email}`}> {soldier.email} </a> </td>
-                            <td className="under" style={!soldier.superior ? {pointerEvents: "none", opacity: "0.4"} : {}} onClick={() => dispatch(fetchSoldierById(soldier.superior._id))} > 
+                            <td className="under" style={!soldier.superior ? {pointerEvents: "none", opacity: "0.4"} : {}} onClick={() => dispatch(fetchSoldiers({soldier_id : soldier.superior._id}))} > 
                                 {soldier.superior && soldier.superior.name} 
                             </td>
                             <td className="under" style={soldier.ds_num === 0 ? {pointerEvents: "none", opacity: "0.4"} : {}} onClick={() => handleDSNumClick({id: soldier.id})}> 

@@ -16,21 +16,68 @@ const AddSolder = (props) => {
     const [image, setImage] = useState();
     
     const mySubmit = async (soldier) => {
-        //console.log("submitting solder: ", soldier);
-        //console.log("submitting image: ", image);
         let imageUrl = {imageUrl : image ? `/photos/${image.name}` : "/photos/default_avatar.jpg"};
         soldier = {...soldier, ...imageUrl};
-        //console.log("about to push new soldier", soldier);
         dispatch(addSoldier(soldier)).then(() => {
+            console.log("fetching soldiers [ADD SOLDIER] : ");
             dispatch(fetchSoldiers({superior_id: globalSuperiorId, sortField: globalSortField, order: globalOrder, limit: globalLimit, filter: searchTerm})).then(() => {
                 history.goBack();
             })
         })
     }
-    const handleCancel = () => {
-        //console.log("cancelling");
+
+    const handleCancel = async () => {
+        console.log("cancelling");
+        /*let autosoldiers = createSoldiers(10);
+        console.log("auto soldiers :  ", autosoldiers);
+        //await dispatch(addSoldier(autosoldiers[0]));
+        //await dispatch(addSoldier(autosoldiers[1]));
+        console.log("testing auto added soldiers");
+        for (let i = 0; i < 10; i++) {
+            await dispatch(addSoldier(autosoldiers[i]));
+        }*/
         history.goBack();
     }
+
+    const createSoldiers = (num) => {
+        let autosoldiers = [];
+        let nameArr = shuffleNameArray();
+        for (let i = 0; i < num; i++) {
+            let soldier = {
+                name : nameArr[i],
+                rank : rankOptions[generateRandom(rankOptions.length)],
+                sex : sex[generateRandom(2)],
+                startDate : `${generateRandom(12, 1)}-${generateRandom(29, 1)}-${generateRandom(30) + 1980}`,
+                phone : `${generateRandom(999 - 100, 100)}-${generateRandom(999 - 100, 100)}-${(generateRandom(9999 - 1000, 1000))}`,
+                email : `${nameArr[i].substring(0, 3)}@gmail.com`
+            }
+            autosoldiers.push(soldier);
+        }
+        return autosoldiers;
+    }
+
+    const generateRandom = (num, lowBound = 0) => {
+        return lowBound + Math.floor(Math.random() * (num));
+    }
+
+    const rankOptions = ["General", "Colonel", "Major", "Captain", "Lieutenant", "Warrant Officer",
+"Sergeant", "Corporal", "Specialist", "Private"];
+    const sex = ["F", "M"];
+    function shuffleNameArray() { 
+        let array = ["Katie Su", "Kevin Su", "Cindy Su", "John White", "Tony Li", "Cole Faust", "Sara Faust", "Logan Faust", "Shawn Piper", "Michael Brown", 
+    "George Brown", "Donald Trump", "Kelly Yang", "LeZi", "Fanny Windson", "Jasmine Su", "Jay Chow", "Vicky Liu", "Andy Wang", "Taylor Swift",
+    "Sandy Guo", "Bobby Brown", "William Hua", "Brendan Bene", "Jenny Fineman", "Joe Hofmann", "Ryan Hunter"];
+        for (var i = array.length - 1; i > 0; i--) {  
+            // Generate random number  
+            var j = Math.floor(Math.random() * (i + 1)); 
+                        
+            var temp = array[i]; 
+            array[i] = array[j]; 
+            array[j] = temp; 
+        } 
+        return array; 
+    } 
+
     return (
         <div>
            <h3>New Soldier</h3> 
@@ -38,6 +85,9 @@ const AddSolder = (props) => {
            <Form onSubmit={mySubmit} onCancel={handleCancel}/>
         </div>
     );
+
+    
+
 }
 
 

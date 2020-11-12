@@ -12,39 +12,26 @@ const Table = (props) => {
   const globalSortField = useSelector((state) => state.soldiers.sortField);
   const globalSuperiorId = useSelector((state) => state.soldiers.superior_id);
   const hasNextPage = useSelector((state) => state.soldiers.pagination.hasNextPage);
+  const previousScrollPosition = useSelector((state) => state.soldiers.previousScrollPosition);
   const [hasMore, setHasMore] = useState(hasNextPage);
-  //const previousScrollPosition = useSelector((state) => state.soldiers.previousScrollPosition);
-  //const ref = useRef();
-  //const [globalScrollTop, setGlobalScrollTop] = useState(0);
   useEffect(() => {
     setHasMore(hasNextPage);
-    //setGlobalScrollTop(previousScrollPosition);
-    //console.log("global scroll", globalScrollTop);
   }, [hasNextPage]);
 
-  const fetchMoreSoldiers = () => {
-    console.log("fetching new soldiers");
-    //dispatch(fetchSoldiers({skip: soldiers.length, superior_id: globalSuperiorId, sortField: globalSortField, order: globalOrder}))
-    setTimeout(() => {
-      dispatch(fetchSoldiers({skip: soldiers.length, superior_id: globalSuperiorId, sortField: globalSortField, order: globalOrder}))
-    }, 500);
-    
-  }
-  /*
-  
-      height={`${53 * soldiers.length}px`}
-      onScroll={handleScroll}
-      ref={ref}
-      initialScrollY="0px"
+  useEffect(() => {
+    console.log("previousScrollPosition: " + previousScrollPosition);
+    props.scrollArea.current.scrollTo(0, previousScrollPosition);
+  }, [])
 
-  const handleScroll = () => {
-    setScrollTop(ref.current.lastScrollTop);
-    console.log("current scrollTop: ", ref);
+  const fetchMoreSoldiers = () => {
+    console.log("fetching new soldiers [Scrolling Update] : " + "has next page?  " + hasNextPage + hasMore);
+    if (hasNextPage === true) {
+      setTimeout(() => {
+        dispatch(fetchSoldiers({skip: soldiers.length, superior_id: globalSuperiorId, sortField: globalSortField, order: globalOrder}))
+      }, 500);
+    }
   }
-  */
-  //console.log("previousScrollPosition: " + previousScrollPosition);
-    // Render the UI for your table
-    
+  //console.log("solders in table: ", soldiers);
   return (
     <div>
       <table>
@@ -52,7 +39,7 @@ const Table = (props) => {
       </table>
       <div style={{height:`${52 * 5}px`, overflow:"auto"}} ref={props.scrollArea}>
         <InfiniteScroll
-          pageStart={1}
+          pageStart={0}
           loadMore={fetchMoreSoldiers}
           hasMore={hasMore}
           loader={<h6 key="myH4">Loading next page...</h6>}
@@ -62,7 +49,7 @@ const Table = (props) => {
           threshold={50}
         >
           <table>
-              <TableBody />
+              <TableBody scrollArea={props.scrollArea}/>
               <tfoot>
               <tr>
                 <td>{hasMore ? "" : "You've reached my limit :("}</td>
