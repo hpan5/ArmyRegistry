@@ -24,7 +24,7 @@ const Table = (props) => {
   }, [])
 
   const fetchMoreSoldiers = () => {
-    console.log("fetching new soldiers [Scrolling Update] : " + "has next page?  " + hasNextPage + hasMore);
+    //console.log("fetching new soldiers [Scrolling Update] : " + "has next page?  " + hasNextPage + hasMore);
     if (hasNextPage === true) {
       setTimeout(() => {
         dispatch(fetchSoldiers({skip: soldiers.length, superior_id: globalSuperiorId, sortField: globalSortField, order: globalOrder}))
