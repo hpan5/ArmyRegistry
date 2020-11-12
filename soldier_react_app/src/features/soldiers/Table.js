@@ -21,7 +21,7 @@ const Table = (props) => {
   useEffect(() => {
     console.log("previousScrollPosition: " + previousScrollPosition);
     props.scrollArea.current.scrollTo(0, previousScrollPosition);
-  }, [])
+  }, [previousScrollPosition, props.scrollArea])
 
   const fetchMoreSoldiers = () => {
     //console.log("fetching new soldiers [Scrolling Update] : " + "has next page?  " + hasNextPage + hasMore);

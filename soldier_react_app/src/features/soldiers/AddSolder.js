@@ -39,6 +39,14 @@ const AddSolder = (props) => {
         history.goBack();
     }
 
+    return (
+        <div>
+           <h3>New Soldier</h3> 
+           <ImagePicker file={image} onChange={(e) => setImage(e.target.files[0])}/>
+           <Form onSubmit={mySubmit} onCancel={handleCancel}/>
+        </div>
+    );
+/*
     const createSoldiers = (num) => {
         let autosoldiers = [];
         let nameArr = shuffleNameArray();
@@ -77,15 +85,7 @@ const AddSolder = (props) => {
         } 
         return array; 
     } 
-
-    return (
-        <div>
-           <h3>New Soldier</h3> 
-           <ImagePicker file={image} onChange={(e) => setImage(e.target.files[0])}/>
-           <Form onSubmit={mySubmit} onCancel={handleCancel}/>
-        </div>
-    );
-
+*/
     
 
 }

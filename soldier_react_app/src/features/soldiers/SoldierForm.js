@@ -25,13 +25,12 @@ let SoldierForm = (props) => {
       <button type="button" onClick={onCancel}> Cancel </button>
       <div className="right-container">
         <div>
-          <label htmlFor="name"> Name: </label>
+          <label htmlFor="name"> *Name: </label>
           <Field name="name" id="name" component={newField} type="text" />
         </div>
         <div>
-          <label htmlFor="rank"> Rank: </label>
+          <label htmlFor="rank"> *Rank: </label>
             <Field name="rank" id="rank" component="select">
-              <option />
               {
                 rankOptions.map((rankOption, i) => {
                   return (
@@ -55,17 +54,17 @@ let SoldierForm = (props) => {
         </div>
 
         <div>
-          <label htmlFor="startDate"> start Date: </label>
+          <label htmlFor="startDate"> *Start Date: </label>
           <Field name="startDate" id="startDate" component={newField} type="text" />
         </div>
         
         <div>
-          <label htmlFor="phone"> Office Phone: </label>
+          <label htmlFor="phone"> *Office Phone: </label>
           <Field name="phone" id="phone" component={newField} type="text" />
         </div>
       
         <div>
-          <label htmlFor="email"> Email: </label>
+          <label htmlFor="email"> *Email: </label>
           <Field name="email" id="email" component={newField} type="text" />
         </div>
       
@@ -89,18 +88,20 @@ let SoldierForm = (props) => {
 
 const myValidator = values => {
   const errors = {};
+  //console.log("values" , values);
   if (!values.name) {
     errors.name = "Name is required";
   }
-  if (!values.rank) {
+  
+  if (!values.rank || values.rank === " ") {
     errors.rank = "Rank is required";
-  }
-  if (!values.sex) {
-    errors.sex = "Sex is required";
+    //console.log("errors.rank" , errors.rank);
   }
   if (!values.startDate) {
     errors.startDate = "StartDate is required";
-  } //need regex check
+  } else if (!/^[0-3]?[0-9].[0-3]?[0-9].(?:[0-9]{2})?[0-9]{2}$/.test(values.startDate)) {
+    errors.startDate = "Valid StartDate is required";
+  }//need regex check
   if (!values.phone) {
     errors.phone = "Phone is required";
   } //need regex check
@@ -124,7 +125,7 @@ const newField = ({
   return (
     <div>
       <input {...input} placeholder={placeholder} type={type} id={id} />
-      {touched && error && <p style={{ color: 'red' }}>{error}</p>}
+      {touched && (error && <span style={{ color: 'red' }}>{error}</span>)}
     </div>
   );
 };
