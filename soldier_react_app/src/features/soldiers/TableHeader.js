@@ -40,7 +40,7 @@ const TableHeader = (props) => {
                 <th onClick={() => changeSortFieldAndOrder('startDate')}> Start Date </th>
                 <th onClick={() => changeSortFieldAndOrder('phone')}> Phone </th>
                 <th onClick={() => changeSortFieldAndOrder('email')}> Email </th>
-                <th onClick={() => changeSortFieldAndOrder('superior')}> Superior </th>
+                <th onClick={() => changeSortFieldAndOrder('superior_name')}> Superior </th>
                 <th onClick={() => changeSortFieldAndOrder('ds_num')}> # of D.S. </th>
                 <th> Edit </th>
                 <th> Delete </th>

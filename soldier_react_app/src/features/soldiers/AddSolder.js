@@ -13,11 +13,15 @@ const AddSolder = (props) => {
     const globalSuperiorId = useSelector((state) => state.soldiers.superior_id);
     const globalLimit = useSelector((state) => state.soldiers.limit);
     const searchTerm = useSelector((state) => state.soldiers.searchTerm);
+    const superiorCandidates = useSelector((state) => state.soldiers.superiorCandidates);
     const [image, setImage] = useState();
     
     const mySubmit = async (soldier) => {
         let imageUrl = {imageUrl : image ? `/photos/${image.name}` : "/photos/default_avatar.jpg"};
-        soldier = {...soldier, ...imageUrl};
+        let pickedSuperior = superiorCandidates.find(superior => superior.id === soldier.superior);
+        let superior_nameObj = {superior_name: pickedSuperior ? pickedSuperior.name : ""};
+        soldier = {...soldier, ...imageUrl, ...superior_nameObj};
+        console.log("soldier ready to be added: ", soldier);
         dispatch(addSoldier(soldier)).then(() => {
             console.log("fetching soldiers [ADD SOLDIER] : ");
             dispatch(fetchSoldiers({superior_id: globalSuperiorId, sortField: globalSortField, order: globalOrder, limit: globalLimit, filter: searchTerm})).then(() => {
@@ -26,27 +30,7 @@ const AddSolder = (props) => {
         })
     }
 
-    const handleCancel = async () => {
-        console.log("cancelling");
-        /*let autosoldiers = createSoldiers(10);
-        console.log("auto soldiers :  ", autosoldiers);
-        //await dispatch(addSoldier(autosoldiers[0]));
-        //await dispatch(addSoldier(autosoldiers[1]));
-        console.log("testing auto added soldiers");
-        for (let i = 0; i < 10; i++) {
-            await dispatch(addSoldier(autosoldiers[i]));
-        }*/
-        history.goBack();
-    }
-
-    return (
-        <div>
-           <h3>New Soldier</h3> 
-           <ImagePicker file={image} onChange={(e) => setImage(e.target.files[0])}/>
-           <Form onSubmit={mySubmit} onCancel={handleCancel}/>
-        </div>
-    );
-/*
+    
     const createSoldiers = (num) => {
         let autosoldiers = [];
         let nameArr = shuffleNameArray();
@@ -57,7 +41,8 @@ const AddSolder = (props) => {
                 sex : sex[generateRandom(2)],
                 startDate : `${generateRandom(12, 1)}-${generateRandom(29, 1)}-${generateRandom(30) + 1980}`,
                 phone : `${generateRandom(999 - 100, 100)}-${generateRandom(999 - 100, 100)}-${(generateRandom(9999 - 1000, 1000))}`,
-                email : `${nameArr[i].substring(0, 3)}@gmail.com`
+                email : `${nameArr[i].substring(0, 3)}@gmail.com`,
+                imageUrl: "/photos/default_avatar.jpg"
             }
             autosoldiers.push(soldier);
         }
@@ -85,7 +70,27 @@ const AddSolder = (props) => {
         } 
         return array; 
     } 
-*/
+
+    const handleCancel = async () => {
+        console.log("cancelling");
+        /*let autosoldiers = createSoldiers(10);
+        console.log("auto soldiers :  ", autosoldiers);
+        console.log("testing auto added soldiers");
+        for (let i = 0; i < 10; i++) {
+            await dispatch(addSoldier(autosoldiers[i]));
+        }*/
+        history.goBack();
+    }
+
+    return (
+        <div>
+           <h3>New Soldier</h3> 
+           <ImagePicker file={image} onChange={(e) => setImage(e.target.files[0])}/>
+           <Form onSubmit={mySubmit} onCancel={handleCancel}/>
+        </div>
+    );
+
+
     
 
 }

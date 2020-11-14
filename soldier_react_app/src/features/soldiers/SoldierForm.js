@@ -8,17 +8,13 @@ let SoldierForm = (props) => {
   const { handleSubmit, valid, onCancel} = props
   const dispatch = useDispatch();
   const superiorCandidates = useSelector((state) => state.soldiers.superiorCandidates);
-  //const editingSoldier = useSelector((state) => state.soldiers.editingSoldier);
   
   useEffect(() => {
     if (superiorCandidates === undefined || superiorCandidates.length === 0) {
       dispatch(fetchSuperiorCandidates({}));
     }
   }, [dispatch, superiorCandidates]);
-  //console.log(superiorCandidates);
 
-
-  //<input type='file' name='image' onChange={onImageBrowse} />
   return (
     <form onSubmit={handleSubmit} >
       <button type="submit" disabled={!valid}> Save </button>
@@ -30,7 +26,7 @@ let SoldierForm = (props) => {
         </div>
         <div>
           <label htmlFor="rank"> *Rank: </label>
-            <Field name="rank" id="rank" component="select">
+            <Field name="rank" id="rank" component="select" value={"General"}>
               {
                 rankOptions.map((rankOption, i) => {
                   return (
@@ -54,12 +50,12 @@ let SoldierForm = (props) => {
         </div>
 
         <div>
-          <label htmlFor="startDate"> *Start Date: </label>
+          <label htmlFor="startDate"> *Start Date: (dd/mm/yyyy)</label>
           <Field name="startDate" id="startDate" component={newField} type="text" />
         </div>
         
         <div>
-          <label htmlFor="phone"> *Office Phone: </label>
+          <label htmlFor="phone"> *Office Phone: (xxx-xxx-xxxx) </label>
           <Field name="phone" id="phone" component={newField} type="text" />
         </div>
       
@@ -85,25 +81,21 @@ let SoldierForm = (props) => {
     </form>
   )
 }
-
+//{id : candidate.id, name: candidate.name}
 const myValidator = values => {
   const errors = {};
-  //console.log("values" , values);
   if (!values.name) {
     errors.name = "Name is required";
-  }
-  
-  if (!values.rank || values.rank === " ") {
-    errors.rank = "Rank is required";
-    //console.log("errors.rank" , errors.rank);
   }
   if (!values.startDate) {
     errors.startDate = "StartDate is required";
   } else if (!/^[0-3]?[0-9].[0-3]?[0-9].(?:[0-9]{2})?[0-9]{2}$/.test(values.startDate)) {
-    errors.startDate = "Valid StartDate is required";
+    errors.startDate = "Valid start date is required";
   }//need regex check
   if (!values.phone) {
     errors.phone = "Phone is required";
+  }else if (!/\d{3}-\d{3}-\d{4}/.test(values.phone)) {
+    errors.phone = "Valid phone format is required";
   } //need regex check
   if (!values.email) {
     errors.email = 'An email is required';
@@ -111,8 +103,10 @@ const myValidator = values => {
     // use a more robust RegEx in real-life scenarios
     errors.email = 'Valid email is required';
   }
+  console.log("errors" , errors);
   return errors;
 };
+
 
 const newField = ({
   input,
@@ -138,7 +132,7 @@ SoldierForm = reduxForm({
 //enableReinitialize: true
 SoldierForm = connect(
   state => ({
-    initialValues: state.soldiers.editingSoldier ? state.soldiers.editingSoldier : {}
+    initialValues: state.soldiers.editingSoldier ? state.soldiers.editingSoldier : {sex: "M", rank: "General"}
   })
 )(SoldierForm)
 

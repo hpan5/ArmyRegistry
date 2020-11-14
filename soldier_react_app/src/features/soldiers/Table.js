@@ -19,19 +19,16 @@ const Table = (props) => {
   }, [hasNextPage]);
 
   useEffect(() => {
-    console.log("previousScrollPosition: " + previousScrollPosition);
     props.scrollArea.current.scrollTo(0, previousScrollPosition);
   }, [previousScrollPosition, props.scrollArea])
 
   const fetchMoreSoldiers = () => {
-    //console.log("fetching new soldiers [Scrolling Update] : " + "has next page?  " + hasNextPage + hasMore);
     if (hasNextPage === true) {
       setTimeout(() => {
         dispatch(fetchSoldiers({skip: soldiers.length, superior_id: globalSuperiorId, sortField: globalSortField, order: globalOrder}))
       }, 500);
     }
   }
-  //console.log("solders in table: ", soldiers);
   return (
     <div>
       <table>

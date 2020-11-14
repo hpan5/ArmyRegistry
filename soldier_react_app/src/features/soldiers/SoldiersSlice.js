@@ -32,24 +32,23 @@ export const addSoldier = createAsyncThunk('soldiers/addSoldier', async (soldier
     const apiUrl =  `${url}addNewSoldier/`;
     //console.log("apiUrl:" + apiUrl);
     const response = await axios.post(apiUrl, soldier);
-    console.log(response.data);
+    console.log("successfully added", response.data);
     return soldier;
 });
 
 //create and edit a soldier
 export const editSoldier = createAsyncThunk('soldiers/editSoldier', async (props) => {
-    console.log(props);
     const { id, soldier } = props;
     const apiUrl =  `${url}editSoldier/${id}`;
-    console.log("editing soldiers!!!! apiUrl:" + apiUrl);
+    //console.log("editing soldiers!!!! apiUrl:" + apiUrl);
     const response = await axios.put(apiUrl, soldier);
-    console.log(response.data);
+    console.log("successfully edited", response.data);
     return soldier;
 });
 
 //fetch the soldier based on sortfield, sortOrder and need to skip number
 export const fetchSoldiers = createAsyncThunk('soldiers/fetchSoldiers', async (props) => {
-    console.log(props);
+    //console.log(props);
     const {soldier_id=undefined, superior_id = undefined, sortField = undefined, order = "", skip = 0, filter='', limit=5} = props;
     //console.log("sortField: " + sortField.toString() + ", sortOrder: " + order.toString() + ", skip:" + skip);
     const apiUrl =  `${url}fetchSoldiers?` + 
@@ -143,18 +142,13 @@ const soldiersSlice = createSlice({
         setSearchTerm(state, action) {
             const { searchTerm } = action.payload;
             state.searchTerm = searchTerm;
-            //console.log("search Term: " + searchTerm);
         },
         setPreviousScrollPosition(state, action) {
-            //console.log("hello?")
             const { previousScrollPosition } = action.payload;
-            console.log("state.previousScrollPosition: " + action.payload.previousScrollPosition);
             state.previousScrollPosition = previousScrollPosition;
-            //console.log("state.previousScrollPosition: " + state.previousScrollPosition);
         },
         resetEditingSoldier(state, action) {
             state.editingSoldier = undefined;
-            //console.log("reset editing soldier")
         }
     },
     extraReducers: {
@@ -184,12 +178,7 @@ const soldiersSlice = createSlice({
             }
             if (state.searchTerm === '') {
                 state.limit = state.soldiers.length <= 5 ? state.limit : state.soldiers.length;
-                //console.log("state.searchTerm: " + state.searchTerm);
-                //console.log("state.limit: " + state.limit);
             }
-
-            
-            //state.soldiers.concat(action.payload)
         },
         [fetchSoldiers.rejected]: (state, action) => {
             state.status = 'failed'
