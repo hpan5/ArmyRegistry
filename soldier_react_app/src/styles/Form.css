@@ -3,6 +3,9 @@
     width: 50%;
 }
 
+.left-container image{
+    justify-self: center;
+}
 
 .right-container{
     float: right;
@@ -12,4 +15,22 @@
 button{
     float: right;
     margin: 2px;
+}
+
+input {
+    width: 60%;
+    font-size: 12px;
+}
+
+.select {
+    width: 70%;
+    font-size: 12px;
+}
+
+.genderBlock {
+    display: inline;
+}
+
+.genderBlock label {
+    display: inline-block;
 }

@@ -129,14 +129,15 @@ const soldiersSlice = createSlice({
             state.editingSoldier = {
                 id : editingSoldier.id,
                 name : editingSoldier.name,
-                rank : editingSoldier.rank,
+                rank : {value: editingSoldier.rank, label: editingSoldier.rank},
                 sex : editingSoldier.sex,
                 startDate : editingSoldier.startDate,
                 phone : editingSoldier.phone,
                 email : editingSoldier.email,
-                superior : editingSoldier.superior && editingSoldier.superior._id,
+                superior : editingSoldier.superior && {value: editingSoldier.superior._id, label: editingSoldier.superior.name},
                 imageUrl : editingSoldier.imageUrl
             };
+            console.log("editingSoldier" , state.editingSoldier);
             //state.editingSoldier.superior = editingSoldier.superior && editingSoldier.superior._id;
         },
         setSearchTerm(state, action) {
@@ -203,7 +204,13 @@ const soldiersSlice = createSlice({
         [fetchSuperiorCandidates.fulfilled]: (state, action) => {
             state.status = 'succeeded'
             console.log("fetchSoldierById succeeded");
-            state.superiorCandidates = [...action.payload]//state.soldiers.concat(action.payload)
+            let candidatesOptions = new Array();
+            candidatesOptions.push({})
+            for (let candidate of action.payload ) {
+                candidatesOptions.push({"value" : candidate.id, "label": candidate.name});
+            }
+            //console.log("candidates options", candidatesOptions);
+            state.superiorCandidates = [...candidatesOptions]//state.soldiers.concat(action.payload)
         },
         [fetchSuperiorCandidates.rejected]: (state, action) => {
             state.status = 'failed'

@@ -58,7 +58,7 @@ const TableBody = (props) => {
             </tr>
         );
     } else {
-        console.log("content: ", soldiers);
+        //console.log("content: ", soldiers);
         content = (
             soldiers.map((soldier, i) => {
                 return (

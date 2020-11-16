@@ -14,14 +14,16 @@ function ImagePicker(props) {
 
   return (
     <div className='left-container'>
-      <Image
-        src={imageURL}
-        alt="preview"
-        className="preview-image"
-        style={{ height: "100px", objectFit: "cover" }}
-      />
-      <div>
-        <input type="file" onChange={props.onChange}/>
+      <div className="innerBlock">
+        <Image
+          src={imageURL}
+          alt="preview"
+          className="preview-image"
+          style={{ height: "100px", objectFit: "cover" }}
+        />
+        <div>
+          <input type="file" onChange={props.onChange}/>
+        </div>
       </div>
     </div>
   );

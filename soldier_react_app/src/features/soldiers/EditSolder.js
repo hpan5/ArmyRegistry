@@ -17,11 +17,11 @@ const EditSolder = (props) => {
     const [image, setImage] = useState();
     const handleSubmit = (soldier) => {
         let imageUrl = {imageUrl : image ? `/photos/${image.name}` : "/photos/default_avatar.jpg"};
-        let pickedSuperior = superiorCandidates.find(superior => superior.id === soldier.superior);
-        let superior_nameObj = {superior_name: pickedSuperior ? pickedSuperior.name : ""};
-        soldier = {...soldier, ...imageUrl, ...superior_nameObj};
-        console.log("about to edit soldier", soldier);
-        //console.log("editing soldier id: " + editingSoldier);
+        let rank = {rank: soldier.rank.value};
+        let superior = {superior: soldier.superior && soldier.superior.value};
+        let superior_name = {superior_name: soldier.superior && soldier.superior.label};
+        soldier = {...soldier, ...imageUrl, ...superior_name, ...superior, ...rank};
+        console.log("soldier ready to be edited: ", soldier);
         dispatch(editSoldier({id: editingSoldier.id, soldier: soldier})).then(() => {
             console.log("fetching soldiers [EDIT SOLDIER]: ");
             dispatch(fetchSoldiers({superior_id: globalSuperiorId, sortField: globalSortField, order: globalOrder, limit: globalLimit, filter: searchTerm})).then(() => {
