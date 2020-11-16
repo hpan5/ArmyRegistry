@@ -20,7 +20,6 @@ router.get('/fetchSoldiers', async (req, res) => {
     let filter = isDefined(req.query.filter) ? req.query.filter.toString() : '';
     const skip =
       req.query.skip && /^\d+$/.test(req.query.skip) ? Number(req.query.skip) : 0;
-    console.log("sortField:" + sortField + ", sortOrder: " + order + ", skip:" + skip + ", filter: " + `/${filter}/`);
     
     try {
         const options = {
@@ -30,13 +29,13 @@ router.get('/fetchSoldiers', async (req, res) => {
             limit: limit
         }
         if (isDefined(soldier_id)) {
-            console.log("looking for direct subordinates");
+            //console.log("looking for direct subordinates");
             let filterQuery = {_id: soldier_id};
             let soldiers = await Soldier.paginate(filterQuery, options, (error, result) => {
                 res.send(result);
             })
         } else if (isUndefined(superior_id)) {
-            console.log("superior_id is undefined");
+            //console.log("superior_id is undefined");
             let filterQuery = isUndefined(req.query.filter) ? {} : 
             {
                 $or: [
@@ -54,7 +53,7 @@ router.get('/fetchSoldiers', async (req, res) => {
                 res.send(result);
             })
         } else {
-            console.log("looking for direct subordinates");
+            //console.log("looking for direct subordinates");
             let filterQuery = isUndefined(req.query.filter) ? {superior: superior_id} : 
             {
                 $and: [
@@ -116,9 +115,9 @@ const getAllValidSuperiorCandidatesById = async (id) => {
         for (let child of curChildren) {
             queue.push(child._id);
         }
-        console.log("curChildren.length" + curChildren.length + ", queue.length" + queue.length);
+        //console.log("curChildren.length" + curChildren.length + ", queue.length" + queue.length);
     }
-    console.log(childrenArray);
+    //console.log(childrenArray);
     let validSuperiorCandidates = await Soldier.find({_id: {$nin: childrenArray}});
     return validSuperiorCandidates;
 }
@@ -199,7 +198,7 @@ router.post('/addNewSoldier', bodyParser.urlencoded({ extended: false}), async (
 router.put('/editSoldier/:id', async (req, res) => {
     try {
         const soldier = await Soldier.findById(req.params.id);
-        console.log("solder's name: " + soldier.name);
+        //console.log("solder's name: " + soldier.name);
         //edit information except for direct subroutine
         if (soldier.name.toString() !== req.body.name.toString()) {
             await Soldier.find({superior: soldier._id}).update({superior_name : req.body.name});
@@ -222,15 +221,15 @@ router.put('/editSoldier/:id', async (req, res) => {
         //  1. remove the itself from current superiors direct subroutine array
         //  2. add self to new superior's subroutine
         let cur_superior_id = req.body.superior;
-        console.log("soldier.superior: " + JSON.stringify(soldier.superior) + "cur_superior_id: " + JSON.stringify(cur_superior_id));
+        //console.log("soldier.superior: " + JSON.stringify(soldier.superior) + "cur_superior_id: " + JSON.stringify(cur_superior_id));
         if (isUndefined(soldier.superior) && isDefined(cur_superior_id)) {
-            console.log("from undefined to defined");
+            //console.log("from undefined to defined");
             await addDirectSubroutine(cur_superior_id, soldier._id);
         } else if (isDefined(soldier.superior) && isUndefined(cur_superior_id)) {
-            console.log("from defined to undefined");
+            //console.log("from defined to undefined");
             await deleteDirectSubroutine(soldier.superior, soldier._id);
         } else if (isDefined(soldier.superior) && isDefined(cur_superior_id)){
-            console.log("from defined to defined");
+            //console.log("from defined to defined");
             if (cur_superior_id.toString() !== soldier.superior.toString()) {
                 await addDirectSubroutine(cur_superior_id, soldier._id);
                 await deleteDirectSubroutine(soldier.superior, soldier._id);
@@ -249,23 +248,23 @@ router.put('/editSoldier/:id', async (req, res) => {
 router.delete("/deleteSoldier/:id", async (req, res) => {
     try {
         const soldier_toBeDeleted = await Soldier.findById(req.params.id);
-        console.log("soldier to be deleted found: " + soldier_toBeDeleted.name);
+        //console.log("soldier to be deleted found: " + soldier_toBeDeleted.name);
         if (isUndefined(soldier_toBeDeleted.superior)) {
-            console.log("superior is undefined")
+            //console.log("superior is undefined")
             for (let ds_id of soldier_toBeDeleted.direct_subordinates) {
                 let id = ds_id.toString();
-                console.log("ds_id deleting: ", id);
+                //console.log("ds_id deleting: ", id);
                 let subordinate = await Soldier.findById(id);
                 subordinate.superior = undefined;
                 subordinate.superior_name = "";
-                console.log("subordinate removed superior ", subordinate);
+                //console.log("subordinate removed superior ", subordinate);
                 await subordinate.save();
             }
         } else {
-            console.log("superior is defined")
+            //console.log("superior is defined")
             let superior_id = soldier_toBeDeleted.superior;
             let superior_name = soldier_toBeDeleted.superior_name;
-            console.log("superior's id of soldier to be deleted: " + soldier_toBeDeleted.superior);
+            //console.log("superior's id of soldier to be deleted: " + soldier_toBeDeleted.superior);
             for (let ds_id of soldier_toBeDeleted.direct_subordinates) {
                 let id = ds_id.toString();
                 let subordinate = await Soldier.findById(id);
@@ -315,7 +314,7 @@ const isDefined = (value) => {
 }
 
 const deleteDirectSubroutine = async (superior_id, soldier_id) => {
-    console.log("DELETING direct subroutine from a given superior")
+    //console.log("DELETING direct subroutine from a given superior")
     try {
         const superior = await Soldier.findById(superior_id);
         let index;
@@ -325,11 +324,11 @@ const deleteDirectSubroutine = async (superior_id, soldier_id) => {
                 return true;
             }
         })
-        console.log("Given superior's name: " + superior.name);
+        //console.log("Given superior's name: " + superior.name);
         if (found) {
             superior.direct_subordinates.splice(index, 1);
             superior.ds_num = superior.direct_subordinates.length;
-            console.log("after deleted from superior: superior.ds_num: " + superior.ds_num);
+            //console.log("after deleted from superior: superior.ds_num: " + superior.ds_num);
             
         } else {
             console.log(" direct subroutine not existed");
@@ -343,15 +342,15 @@ const deleteDirectSubroutine = async (superior_id, soldier_id) => {
 
 
 const addDirectSubroutine = async (superior_id, soldier_id) => {
-    console.log("ADDING direct subroutine from a given superior")
+    //console.log("ADDING direct subroutine from a given superior")
     try {
         const superior = await Soldier.findById(superior_id);
-        console.log("solder's superior_name: " + superior.name);
+        //.log("solder's superior_name: " + superior.name);
         superior.direct_subordinates.push(soldier_id);
         superior.ds_num = superior.direct_subordinates.length;
-        console.log(superior.direct_subordinates);
+        //console.log(superior.direct_subordinates);
         await superior.save();
-        console.log("succesfully ADDED");
+        //console.log("succesfully ADDED");
     } catch(error) {
         console.log("add direct subroutine failed")
     }

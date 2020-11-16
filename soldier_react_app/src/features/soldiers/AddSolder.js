@@ -21,7 +21,7 @@ const AddSolder = (props) => {
         let pickedSuperior = superiorCandidates.find(superior => superior.id === soldier.superior);
         let superior_nameObj = {superior_name: pickedSuperior ? pickedSuperior.name : ""};
         soldier = {...soldier, ...imageUrl, ...superior_nameObj};
-        console.log("soldier ready to be added: ", soldier);
+        //console.log("soldier ready to be added: ", soldier);
         dispatch(addSoldier(soldier)).then(() => {
             console.log("fetching soldiers [ADD SOLDIER] : ");
             dispatch(fetchSoldiers({superior_id: globalSuperiorId, sortField: globalSortField, order: globalOrder, limit: globalLimit, filter: searchTerm})).then(() => {
@@ -59,7 +59,16 @@ const AddSolder = (props) => {
     function shuffleNameArray() { 
         let array = ["Katie Su", "Kevin Su", "Cindy Su", "John White", "Tony Li", "Cole Faust", "Sara Faust", "Logan Faust", "Shawn Piper", "Michael Brown", 
     "George Brown", "Donald Trump", "Kelly Yang", "LeZi", "Fanny Windson", "Jasmine Su", "Jay Chow", "Vicky Liu", "Andy Wang", "Taylor Swift",
-    "Sandy Guo", "Bobby Brown", "William Hua", "Brendan Bene", "Jenny Fineman", "Joe Hofmann", "Ryan Hunter"];
+    "Sandy Guo", "Bobby Brown", "William Hua", "Brendan Bene", "Jenny Fineman", "Joe Hofmann", "Ryan Hunter",
+    "Rhea McLaughlin", "Shiloh West", "Brycen Boyle", "Mckinley Rush", "Meadow Houston", "Marianna Duke", "Cayden Curtis", "Yesenia Gray", "Stephany Cooke",
+    "Karter Patterson", "Karter Patterson", "Kristina Frazier", "Korbin Frye", "Jonas Jarvis",
+    "Lilah Rush","Ryland Foster","Carleigh Hendrix","Lyric Stout","Ivy Santos","Averie Hunter","Deven Richmond",
+    "Marcelo Hubbard","Uriel Pineda","Destiny Chung","Harper Ali","Bailee Banks","Christian Goodman","Leandro Hooper","Jack Richard",
+    "Davian Ballard","Abril Campbell","Cash Frey","Antoine Fleming","Efrain Watkins","Sarai Harrell","Ximena Webb","Izabelle Fox",
+    "Matteo Castaneda","Jenny Ibarra","Todd Ortega","Memphis Kennedy","Luciana Arnold","Madalynn Dominguez","Emerson Lloyd",
+    "Emanuel Snyder","Xander Walter"
+];
+
         for (var i = array.length - 1; i > 0; i--) {  
             // Generate random number  
             var j = Math.floor(Math.random() * (i + 1)); 
@@ -72,8 +81,8 @@ const AddSolder = (props) => {
     } 
 
     const handleCancel = async () => {
-        console.log("cancelling");
-        /*let autosoldiers = createSoldiers(10);
+        /*console.log("cancelling");
+        let autosoldiers = createSoldiers(10);
         console.log("auto soldiers :  ", autosoldiers);
         console.log("testing auto added soldiers");
         for (let i = 0; i < 10; i++) {

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { addEditingUser, fetchSuperiorCandidates, selectAllSoldiers, fetchSoldiers, deleteSoldierById, setNewSuperiorId, setPreviousScrollPosition } from './SoldiersSlice'
+import { addEditingUser, fetchSuperiorCandidates, selectAllSoldiers, fetchSoldiers, deleteSoldierById, setNewSuperiorId, setPreviousScrollPosition, reset } from './SoldiersSlice'
 import { useHistory } from 'react-router-dom';
 
 const TableBody = (props) => {
@@ -37,11 +37,19 @@ const TableBody = (props) => {
             dispatch(fetchSoldiers({superior_id: globalSuperiorId, sortField: globalSortField, order: globalOrder, limit: globalLimit, filter: searchTerm}));
         })
     }
+
     const handleDSNumClick = (props) => {
         const { id } = props;
+        dispatch(reset());
         dispatch(setNewSuperiorId({superior_id: id}));
         dispatch(fetchSoldiers({superior_id: id}));
     }
+
+    const handleSuperiorNameClick = (soldier_id) => {
+        dispatch(reset());
+        dispatch(fetchSoldiers({soldier_id : soldier_id}));
+    }
+    
     let content;
     if (globalStatus === 'failed') {
         content = (
@@ -62,7 +70,7 @@ const TableBody = (props) => {
                             <td> {soldier.startDate} </td>
                             <td> <a href={`tel:${soldier.phone}`}> {soldier.phone}</a></td>
                             <td> <a href={`mailto:${soldier.email}`}> {soldier.email} </a> </td>
-                            <td className="under" style={!soldier.superior ? {pointerEvents: "none", opacity: "0.4"} : {}} onClick={() => dispatch(fetchSoldiers({soldier_id : soldier.superior._id}))} > 
+                            <td className="under" style={!soldier.superior ? {pointerEvents: "none", opacity: "0.4"} : {}} onClick={() => handleSuperiorNameClick(soldier.superior._id)} > 
                                 {soldier.superior && soldier.superior.name} 
                             </td>
                             <td className="under" style={soldier.ds_num === 0 ? {pointerEvents: "none", opacity: "0.4"} : {}} onClick={() => handleDSNumClick({id: soldier.id})}> 
