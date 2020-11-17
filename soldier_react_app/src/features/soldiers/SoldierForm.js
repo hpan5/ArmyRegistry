@@ -1,33 +1,11 @@
 import React, { useEffect } from 'react'
-import { connect } from 'react-redux';
 //import { Field, reduxForm } from 'redux-form'
 import { Form, Field } from 'react-final-form'
-import { Field as ValidField } from "react-final-form-html5-validation";
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchSuperiorCandidates } from './SoldiersSlice';
 import Select from 'react-select'
 import '../../styles/Form.css'
 
-const customStyles = {
-  menu: (provided, state) => ({
-    ...provided,
-    width: state.selectProps.width,
-    borderBottom: '1px dotted pink',
-    color: state.selectProps.menuColor,
-    padding: 20,
-  }),
-
-  control: (_, { selectProps: { width }}) => ({
-    width: width
-  }),
-
-  singleValue: (provided, state) => {
-    const opacity = state.isDisabled ? 0.5 : 1;
-    const transition = 'opacity 300ms';
-
-    return { ...provided, opacity, transition };
-  }
-}
 
 let SoldierForm = (props) => {
   const { onSubmit, onCancel } = props

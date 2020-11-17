@@ -204,7 +204,7 @@ const soldiersSlice = createSlice({
         [fetchSuperiorCandidates.fulfilled]: (state, action) => {
             state.status = 'succeeded'
             console.log("fetchSoldierById succeeded");
-            let candidatesOptions = new Array();
+            let candidatesOptions = new Array([]);
             candidatesOptions.push({})
             for (let candidate of action.payload ) {
                 candidatesOptions.push({"value" : candidate.id, "label": candidate.name});

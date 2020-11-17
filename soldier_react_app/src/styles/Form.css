@@ -26,11 +26,14 @@ input {
     width: 70%;
     font-size: 12px;
 }
-
 .genderBlock {
+    width: 50%;
+}
+
+/* .genderBlock {
     display: inline;
 }
 
 .genderBlock label {
     display: inline-block;
-}
+} */

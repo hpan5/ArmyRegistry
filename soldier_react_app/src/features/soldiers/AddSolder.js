@@ -13,7 +13,6 @@ const AddSolder = (props) => {
     const globalSuperiorId = useSelector((state) => state.soldiers.superior_id);
     const globalLimit = useSelector((state) => state.soldiers.limit);
     const searchTerm = useSelector((state) => state.soldiers.searchTerm);
-    const superiorCandidates = useSelector((state) => state.soldiers.superiorCandidates);
     const [image, setImage] = useState();
     
     const mySubmit = async (soldier) => {

@@ -12,7 +12,6 @@ const EditSolder = (props) => {
     const globalSuperiorId = useSelector((state) => state.soldiers.superior_id);
     const globalLimit = useSelector((state) => state.soldiers.limit);
     const searchTerm = useSelector((state) => state.soldiers.searchTerm);
-    const superiorCandidates = useSelector((state) => state.soldiers.superiorCandidates);
     const editingSoldier = useSelector((state) => state.soldiers.editingSoldier);
     const [image, setImage] = useState();
     const handleSubmit = (soldier) => {
